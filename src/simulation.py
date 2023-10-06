@@ -1,4 +1,4 @@
-from pvlib.modelchain import ModelChain, ModelChainResult
+from pvlib.modelchain import ModelChain
 from pvlib.pvsystem import PVSystem, Array, FixedMount
 from pvlib.location import Location
 from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS
@@ -11,17 +11,20 @@ def construct_pvsystem(pv: PV):
     module = ram_cached.fetch_modules()[pv.module]
     inverter = ram_cached.fetch_inverters()[pv.inverter]
     temperature_model_parameters = TEMPERATURE_MODEL_PARAMETERS["sapm"][pv.case]
-    mount = FixedMount(
-        surface_azimuth=pv.azimuth,
-        surface_tilt=pv.tilt,
-    )
-    array = Array(
-        mount=mount,
-        module_parameters=module,
-        temperature_model_parameters=temperature_model_parameters,
-    )
+    arrays = []
+    for i in range(pv.number_of_modules):
+        arrays.append(
+            Array(
+                mount=FixedMount(
+                    surface_azimuth=pv.azimuth,
+                    surface_tilt=pv.tilt,
+                ),
+                module_parameters=module,
+                temperature_model_parameters=temperature_model_parameters,
+            )
+        )
     system = PVSystem(
-        arrays=[array] * pv.number_of_modules, inverter_parameters=inverter
+        arrays=arrays, inverter_parameters=inverter
     )
     return system
 

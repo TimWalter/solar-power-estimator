@@ -2,20 +2,20 @@ import requests
 from PIL import Image
 import numpy as np
 
-from global_mercator import GlobalMercator
+from data.global_mercator import GlobalMercator
 from sec.keys import MAPTILER_API_KEY
 
 
-class ElevationProvider:
+class AltitudeProvider:
     def __init__(self, api_key):
         self.api_key = api_key
         self.gm = GlobalMercator(512)
         self.tiles = {}
 
-    def get_elevation(self, lat, lon):
+    def get_altitude(self, lat, lon):
         tile_index = self.get_tile_index(lat, lon, 12)
         tile_data = self.get_or_fetch_tile(tile_index)
-        return self.decode_elevation(lat, lon, tile_index, tile_data)
+        return self.decode_altitude(lat, lon, tile_index, tile_data)
 
     def get_or_fetch_tile(self, tile_index):
         key = self.create_tile_key(tile_index)
@@ -72,7 +72,7 @@ class ElevationProvider:
             ),
         }
 
-    def decode_elevation(self, lat, lon, tile_index, tile_data):
+    def decode_altitude(self, lat, lon, tile_index, tile_data):
         meters = self.gm.LatLonToMeters(lat, lon)
         pixels = self.gm.MetersToPixels(meters["mx"], meters["my"], tile_index["zoom"])
         tile_pixel_extent = self.get_tile_extent_pixels(
@@ -94,4 +94,4 @@ class ElevationProvider:
         return -10000 + ((red * 256 * 256 + green * 256 + blue) * 0.1)
 
 
-elevation_provider = ElevationProvider(MAPTILER_API_KEY)
+altitude_provider = AltitudeProvider(MAPTILER_API_KEY)

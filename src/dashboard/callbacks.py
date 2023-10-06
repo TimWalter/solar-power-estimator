@@ -1,7 +1,7 @@
 import os
 from dash import CeleryManager, DiskcacheManager, Input, Output, State, no_update
 
-from elevation_provider import elevation_provider
+from data.altitude_provider import altitude_provider
 from dashboard.figures import progress_figure, map_figure
 from simulation import simulate
 from optimization import optimize
@@ -71,9 +71,14 @@ def get_callbacks(app):
     def update_location_parameters(value):
         # Callback to update the location parameters given the location name
         longitude, latitude = data.disk_cached.fetch_location(value)[0]["center"]
-        altitude = elevation_provider.get_elevation(latitude, longitude)
+        altitude = altitude_provider.get_altitude(latitude, longitude)
 
-        return latitude, longitude, altitude, map_figure(Position(latitude, longitude, altitude))
+        return (
+            latitude,
+            longitude,
+            altitude,
+            map_figure(Position(latitude, longitude, altitude)),
+        )
 
     @app.callback(
         Output(OUTPUT_TABLE_ID, "data"),
@@ -122,8 +127,8 @@ def get_callbacks(app):
         module,
         case,
         inverter,
-        start_date,
-        end_date,
+        start_str,
+        end_str,
     ):
         if n_clicks is None:
             return no_update, no_update, no_update, no_update
@@ -131,7 +136,10 @@ def get_callbacks(app):
         pos = Position(latitude, longitude, altitude)
         roof = Roof(roof_height, roof_azimuth, roof_tilt)
         pv = PV(number_of_modules, panel_azimuth, panel_tilt, module, case, inverter)
-        time = SimulationTime(start_date, end_date)
+        time = SimulationTime(
+            datetime.strptime(start_str, "%Y-%m-%dT%H:%M:%S"),
+            datetime.strptime(end_str, "%Y-%m-%dT%H:%M:%S"),
+        )
 
         # Step 1: Fetch Data
         radiation = data.disk_cached.fetch_radiation(pos, time)
@@ -141,21 +149,15 @@ def get_callbacks(app):
         result = simulate(pos, roof, pv, radiation)
         set_progress(progress_figure(2))
 
-        # Step 3: Optimize one-sided
+        # Step 3: 1. Optimization
         pv.azimuth, pv.tilt = optimize(pos, roof, pv, radiation, False)
+        result_1s = simulate(pos, roof, pv, radiation, False)
         set_progress(progress_figure(3))
 
-        # Step 4: Simulate one-sided
-        result_1s = simulate(pos, roof, pv, radiation, False)
-        set_progress(progress_figure(4))
-
-        # Step 5: Optimize two-sided
+        # Step 4: 1. Optimization
         pv.azimuth, pv.tilt = optimize(pos, roof, pv, radiation, True)
-        set_progress(progress_figure(5))
-
-        # Step 6: Simulate two-sided
         result_2s = simulate(pos, roof, pv, radiation, True)
-        set_progress(progress_figure(6))
+        set_progress(progress_figure(4))
 
         return (
             get_table_data(result, result_1s, result_2s),

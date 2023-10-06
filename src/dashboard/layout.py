@@ -50,7 +50,7 @@ def location_subsection() -> dbc.Container:
 def house_subsection() -> dbc.Container:
     return dbc.Container(
         [
-            numerical_input("Height (House)", ROOF_HEIGHT_ID, HOUSE_HEIGHT),
+            numerical_input("Height (Roof)", ROOF_HEIGHT_ID, ROOF_HEIGHT),
             numerical_input("Azimuth (Roof)", ROOF_AZIMUTH_ID, ROOF_AZIMUTH),
             numerical_input("Tilt (Roof)", ROOF_TILT_ID, ROOF_TILT),
         ],
@@ -85,7 +85,7 @@ def pv_subsection() -> dbc.Container:
                             MODULE,
                             [MODULE],
                         ),
-                        dropdown_input("Case", CASE_ID, CASE, list(TEMPERATURE_MODEL_PARAMETERS.keys())),
+                        dropdown_input("Case", CASE_ID, CASE, list(TEMPERATURE_MODEL_PARAMETERS["sapm"].keys())),
                         dropdown_input(
                             "Inverter",
                             INVERTER_ID,

@@ -54,17 +54,15 @@ def progress_figure(progress):
         ],
         layout={
             "xaxis": {
-                "range": [0, 6],
+                "range": [0, 4.5],
                 "tickmode": "array",
-                "tickvals": np.array(range(7)) + 0.5,
+                "tickvals": np.array(range(5)) + 0.5,
                 "ticktext": [
                     "Start",
                     "Fetch Data",
-                    "1. Simulation",
+                    "Simulation",
                     "1. Optimization",
-                    "2. Simulation",
                     "2. Optimization",
-                    "3. Simulation",
                 ],
                 "zeroline": False,
             },
@@ -108,26 +106,14 @@ def get_empty_table() -> Tuple[pd.DataFrame, list]:
 
 def get_table_data(result: Result, result_1s: Result, result_2s: Result) -> List[dict]:
     table_data, _ = get_empty_table()
-    table_data["Tilt [°]"] = [
-        result.tilt,
-        result_1s.tilt,
-        result_2s.tilt,
-    ]
-    table_data["Azimuth [°]"] = [
-        result.azimuth,
-        result_1s.azimuth,
-        result_2s.azimuth,
-    ]
-    table_data["Total AC [kW/h]"] = [
-        result.output.ac.sum() / 1000,
-        result_1s.output.ac.sum() / 1000,
-        result_2s.output.ac.sum() / 1000,
-    ]
-    table_data["Total DC [kW/h]"] = [
-        np.sum([r["p_mp"].sum() for r in result.output.dc]) / 1000,
-        np.sum([r["p_mp"].sum() for r in result_1s.output.dc]) / 1000,
-        np.sum([r["p_mp"].sum() for r in result_2s.output.dc]) / 1000,
-    ]
+    for i, res in enumerate([result, result_1s, result_2s]):
+        table_data.at[i, "Tilt [°]"] = res.tilt
+        table_data.at[i, "Azimuth [°]"] = res.azimuth
+        table_data.at[i, "Total AC [kW/h]"] = res.output.ac.sum() / 1000
+        table_data.at[i, "Total DC [kW/h]"] = (
+            np.sum([r["p_mp"].sum() for r in res.output.dc]) / 1000
+        )
+
     table_data["DC/Panel [kW/h]"] = [
         result.output.dc[0]["p_mp"].sum() / 1000,
         result_1s.output.dc[0]["p_mp"].sum() / 1000,

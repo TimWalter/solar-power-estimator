@@ -14,7 +14,7 @@ ROOF_TILT_ID = "roof_tilt"
 
 # Panel
 PANEL_AZIMUTH_ID = "panel_azimuth"
-PANEL_TILT_ID = "panel_elevation"
+PANEL_TILT_ID = "panel_tilt"
 
 # Time
 TIME_ID = "time"
