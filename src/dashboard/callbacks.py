@@ -7,9 +7,10 @@ from simulation import simulate
 from optimization import optimize
 from dashboard.figures import get_table_data, fig1, fig2, fig3
 from constants.ids import *
+from data.containter import *
 
-import current
-import cached
+import data.disk_cached
+import data.ram_cached
 
 
 def get_background_callback_manager():
@@ -38,7 +39,7 @@ def get_callbacks(app):
     def update_location_options(search_value):
         # Callback to show the modules found given the input query
         return (
-            [o for o in cached.data.fetch_modules().keys() if search_value in o]
+            [o for o in data.ram_cached.fetch_modules().keys() if search_value in o]
             if search_value
             else no_update
         )
@@ -50,7 +51,14 @@ def get_callbacks(app):
     )
     def search_location_name(search_value):
         # Callback to show the locations found given the input query
-        return cached.data.fetch_locations(search_value) if search_value else no_update
+        return (
+            [
+                location["place_name"]
+                for location in data.disk_cached.fetch_location(search_value)
+            ]
+            if search_value
+            else no_update
+        )
 
     @app.callback(
         Output(LATITUDE_ID, "value"),
@@ -62,14 +70,10 @@ def get_callbacks(app):
     )
     def update_location_parameters(value):
         # Callback to update the location parameters given the location name
-        longitude, latitude = cached.data.fetch_coordinates(value)
+        longitude, latitude = data.disk_cached.fetch_location(value)[0]["center"]
         altitude = elevation_provider.get_elevation(latitude, longitude)
 
-        current.state.latitude = latitude
-        current.state.longitude = longitude
-        current.state.altitude = altitude
-
-        return latitude, longitude, altitude, map_figure()
+        return latitude, longitude, altitude, map_figure(Position(latitude, longitude, altitude))
 
     @app.callback(
         Output(OUTPUT_TABLE_ID, "data"),
@@ -80,16 +84,17 @@ def get_callbacks(app):
         State(LATITUDE_ID, "value"),
         State(LONGITUDE_ID, "value"),
         State(ALTITUDE_ID, "value"),
-        State(PANEL_AZIMUTH_ID, "value"),
-        State(PANEL_ELEVATION_ID, "value"),
-        State(HOUSE_HEIGHT_ID, "value"),
-        State(TIME_ID, "start_date"),
-        State(TIME_ID, "end_date"),
+        State(ROOF_HEIGHT_ID, "value"),
+        State(ROOF_AZIMUTH_ID, "value"),
         State(ROOF_TILT_ID, "value"),
-        State(MODULE_ID, "value"),
         State(NUMBER_OF_MODULES_ID, "value"),
+        State(PANEL_AZIMUTH_ID, "value"),
+        State(PANEL_TILT_ID, "value"),
+        State(MODULE_ID, "value"),
         State(CASE_ID, "value"),
         State(INVERTER_ID, "value"),
+        State(TIME_ID, "start_date"),
+        State(TIME_ID, "end_date"),
         background=True,
         running=[
             (Output(START_BUTTON_ID, "disabled"), True, False),
@@ -105,43 +110,56 @@ def get_callbacks(app):
     def start_simulation(
         set_progress,
         n_clicks,
-        *simulation_parameters,
+        latitude,
+        longitude,
+        altitude,
+        roof_height,
+        roof_azimuth,
+        roof_tilt,
+        number_of_modules,
+        panel_azimuth,
+        panel_tilt,
+        module,
+        case,
+        inverter,
+        start_date,
+        end_date,
     ):
         if n_clicks is None:
             return no_update, no_update, no_update, no_update
 
-        current.state = current.State(*simulation_parameters)
+        pos = Position(latitude, longitude, altitude)
+        roof = Roof(roof_height, roof_azimuth, roof_tilt)
+        pv = PV(number_of_modules, panel_azimuth, panel_tilt, module, case, inverter)
+        time = SimulationTime(start_date, end_date)
 
         # Step 1: Fetch Data
-        cached.data.fetch_radiation()
+        radiation = data.disk_cached.fetch_radiation(pos, time)
         set_progress(progress_figure(1))
 
         # Step 2: Simulate Manual
-        current.state.manual.result = simulate()
-        current.state.manual.tilt = current.state.panel_tilt
-        current.state.manual.azimuth = current.state.panel_azimuth
+        result = simulate(pos, roof, pv, radiation)
         set_progress(progress_figure(2))
 
         # Step 3: Optimize one-sided
-        (
-            current.state.opt_one_sided.tilt,
-            current.state.opt_one_sided.azimuth,
-        ) = optimize(False)
+        pv.azimuth, pv.tilt = optimize(pos, roof, pv, radiation, False)
         set_progress(progress_figure(3))
 
         # Step 4: Simulate one-sided
-        current.state.opt_one_sided.result = simulate()
+        result_1s = simulate(pos, roof, pv, radiation, False)
         set_progress(progress_figure(4))
 
         # Step 5: Optimize two-sided
-        (
-            current.state.opt_two_sided.tilt,
-            current.state.opt_two_sided.azimuth,
-        ) = optimize(True)
+        pv.azimuth, pv.tilt = optimize(pos, roof, pv, radiation, True)
         set_progress(progress_figure(5))
 
         # Step 6: Simulate two-sided
-        current.state.opt_two_sided.result = simulate(True)
+        result_2s = simulate(pos, roof, pv, radiation, True)
         set_progress(progress_figure(6))
 
-        return get_table_data(), fig1(), fig2(), fig3()
+        return (
+            get_table_data(result, result_1s, result_2s),
+            fig1(result),
+            fig2(result, result_1s, result_2s),
+            fig3(result, result_1s, result_2s),
+        )

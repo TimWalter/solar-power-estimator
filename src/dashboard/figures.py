@@ -5,15 +5,15 @@ import pandas as pd
 import plotly.graph_objs as go
 from dash.dash_table.Format import Format, Scheme, Symbol
 
-import current
+from data.containter import *
 from sec.keys import MAPBOX_API_KEY
 
 
-def map_figure() -> go.Figure:
+def map_figure(pos: Position) -> go.Figure:
     fig = go.Figure(
         go.Scattermapbox(
-            lat=[current.state.latitude],
-            lon=[current.state.longitude],
+            lat=[pos.latitude],
+            lon=[pos.longitude],
             mode="markers",
             marker=go.scattermapbox.Marker(
                 size=20,
@@ -26,8 +26,8 @@ def map_figure() -> go.Figure:
             "accesstoken": MAPBOX_API_KEY,
             "style": "satellite-streets",
             "center": {
-                "lon": current.state.longitude,
-                "lat": current.state.latitude,
+                "lon": pos.longitude,
+                "lat": pos.latitude,
             },
             "zoom": 12.5,
         },
@@ -106,35 +106,32 @@ def get_empty_table() -> Tuple[pd.DataFrame, list]:
     return data, columns
 
 
-def get_table_data() -> List[dict]:
+def get_table_data(result: Result, result_1s: Result, result_2s: Result) -> List[dict]:
     table_data, _ = get_empty_table()
     table_data["Tilt [°]"] = [
-        current.state.manual.tilt,
-        current.state.opt_one_sided.tilt,
-        current.state.opt_two_sided.tilt,
+        result.tilt,
+        result_1s.tilt,
+        result_2s.tilt,
     ]
     table_data["Azimuth [°]"] = [
-        current.state.manual.azimuth,
-        current.state.opt_one_sided.azimuth,
-        current.state.opt_two_sided.azimuth,
+        result.azimuth,
+        result_1s.azimuth,
+        result_2s.azimuth,
     ]
     table_data["Total AC [kW/h]"] = [
-        current.state.manual.result.ac.sum() / 1000,
-        current.state.opt_one_sided.result.ac.sum() / 1000,
-        current.state.opt_two_sided.result.ac.sum() / 1000,
+        result.output.ac.sum() / 1000,
+        result_1s.output.ac.sum() / 1000,
+        result_2s.output.ac.sum() / 1000,
     ]
     table_data["Total DC [kW/h]"] = [
-        np.sum([r["p_mp"].sum() for r in current.state.manual.result.dc]) / 1000,
-        np.sum([r["p_mp"].sum() for r in current.state.opt_one_sided.result.dc]) / 1000,
-        np.sum([r["p_mp"].sum() for r in current.state.opt_two_sided.result.dc]) / 1000,
+        np.sum([r["p_mp"].sum() for r in result.output.dc]) / 1000,
+        np.sum([r["p_mp"].sum() for r in result_1s.output.dc]) / 1000,
+        np.sum([r["p_mp"].sum() for r in result_2s.output.dc]) / 1000,
     ]
     table_data["DC/Panel [kW/h]"] = [
-        current.state.manual.result.dc[0]["p_mp"].sum() / 1000,
-        current.state.opt_one_sided.result.dc[0]["p_mp"].sum() / 1000,
-        (
-            current.state.opt_two_sided.result.dc[0]["p_mp"].sum()
-            + current.state.opt_two_sided.result.dc[-1]["p_mp"].sum()
-        )
+        result.output.dc[0]["p_mp"].sum() / 1000,
+        result_1s.output.dc[0]["p_mp"].sum() / 1000,
+        (result_2s.output.dc[0]["p_mp"].sum() + result_2s.output.dc[-1]["p_mp"].sum())
         / 2000,
     ]
     return table_data.to_dict("records")
@@ -169,14 +166,14 @@ def plot_results(x, data: list, names: list, title: str, non_visible_indices: li
     return fig
 
 
-def fig1() -> go.Figure:
-    result_dc = np.sum([r["p_mp"] for r in current.state.manual.result.dc], axis=0)
+def fig1(result: Result) -> go.Figure:
+    result_dc = np.sum([r["p_mp"] for r in result.output.dc], axis=0)
     return plot_results(
-        current.state.manual.result.times,
+        result.output.times,
         [
-            current.state.manual.result.ac,
+            result.output.ac,
             result_dc,
-            result_dc - current.state.manual.result.ac,
+            result_dc - result.output.ac,
         ],
         [f"Manual (AC)", f"Manual (DC)", f"Differential (DC-AC)"],
         "Manual Power Output",
@@ -184,20 +181,19 @@ def fig1() -> go.Figure:
     )
 
 
-def fig2() -> go.Figure:
+def fig2(result: Result, result_1s: Result, result_2s: Result) -> go.Figure:
     max_output = (
-        current.state.opt_one_sided.result.ac
-        if current.state.opt_one_sided.result.ac.sum()
-        > current.state.opt_two_sided.result.ac.sum()
-        else current.state.opt_two_sided.result.ac
+        result_1s.output.ac
+        if result_1s.output.ac.sum() > result_2s.output.ac.sum()
+        else result_2s.output.ac
     )
     return plot_results(
-        current.state.manual.result.times,
+        result.output.times,
         [
-            current.state.manual.result.ac,
-            current.state.opt_one_sided.result.ac,
-            current.state.opt_two_sided.result.ac,
-            max_output - current.state.manual.result.ac,
+            result.output.ac,
+            result_1s.output.ac,
+            result_2s.output.ac,
+            max_output - result.output.ac,
         ],
         [
             f"Manual (AC)",
@@ -210,24 +206,18 @@ def fig2() -> go.Figure:
     )
 
 
-def fig3() -> go.Figure:
+def fig3(result: Result, result_1s: Result, result_2s: Result) -> go.Figure:
     return plot_results(
-        current.state.manual.result.times,
+        result.output.times,
         [
-            current.state.manual.result.dc[0]["p_mp"],
-            current.state.opt_one_sided.result.dc[0]["p_mp"],
-            current.state.opt_two_sided.result.dc[0]["p_mp"],
-            current.state.opt_two_sided.result.dc[-1]["p_mp"],
-            current.state.opt_one_sided.result.dc[0]["p_mp"]
-            - current.state.manual.result.dc[0]["p_mp"],
-            current.state.opt_one_sided.result.dc[0]["p_mp"]
-            - (
-                current.state.opt_two_sided.result.dc[0]["p_mp"]
-                + current.state.opt_two_sided.result.dc[-1]["p_mp"]
-            )
-            / 2,
-            current.state.opt_two_sided.result.dc[0]["p_mp"]
-            - current.state.opt_two_sided.result.dc[-1]["p_mp"],
+            result.output.dc[0]["p_mp"],
+            result_1s.output.dc[0]["p_mp"],
+            result_2s.output.dc[0]["p_mp"],
+            result_2s.output.dc[-1]["p_mp"],
+            result_1s.output.dc[0]["p_mp"] - result.output.dc[0]["p_mp"],
+            result_1s.output.dc[0]["p_mp"]
+            - (result_2s.output.dc[0]["p_mp"] + result_2s.output.dc[-1]["p_mp"]) / 2,
+            result_2s.output.dc[0]["p_mp"] - result_2s.output.dc[-1]["p_mp"],
         ],
         [
             "Manual (DC)",

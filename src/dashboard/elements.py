@@ -1,9 +1,9 @@
-from datetime import datetime
 from dash import html, dcc, dash_table
 import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
 
 from dashboard.figures import get_empty_table, progress_figure, map_figure
+from data.containter import *
 from constants.ids import *
 
 
@@ -31,10 +31,10 @@ def dropdown_input(
     )
 
 
-def get_map() -> dcc.Graph:
+def get_map(pos: Position) -> dcc.Graph:
     return dcc.Graph(
         id=MAP_ID,
-        figure=map_figure(),
+        figure=map_figure(pos),
         config={"autosizable": True, "scrollZoom": True},
         style={"padding": 0},
     )

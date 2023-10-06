@@ -1,8 +1,10 @@
+from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS
+
 from dashboard.elements import *
 from constants.defaults import *
 from constants.ids import *
 
-import cached
+from data import ram_cached
 
 
 def title() -> html.H1:
@@ -22,7 +24,7 @@ def location_subsection() -> dbc.Container:
                     )
                 ),
             ),
-            dbc.Row(dbc.Col(get_map())),
+            dbc.Row(dbc.Col(get_map(Position(LATITUDE, LONGITUDE, ALTITUDE)))),
             dbc.Row(
                 [
                     dbc.Col(
@@ -48,7 +50,7 @@ def location_subsection() -> dbc.Container:
 def house_subsection() -> dbc.Container:
     return dbc.Container(
         [
-            numerical_input("Height (House)", HOUSE_HEIGHT_ID, HOUSE_HEIGHT),
+            numerical_input("Height (House)", ROOF_HEIGHT_ID, HOUSE_HEIGHT),
             numerical_input("Azimuth (Roof)", ROOF_AZIMUTH_ID, ROOF_AZIMUTH),
             numerical_input("Tilt (Roof)", ROOF_TILT_ID, ROOF_TILT),
         ],
@@ -71,7 +73,7 @@ def pv_subsection() -> dbc.Container:
                             "Azimuth (Panel)", PANEL_AZIMUTH_ID, PANEL_AZIMUTH
                         ),
                         numerical_input(
-                            "Tilt (Panel)", PANEL_ELEVATION_ID, PANEL_ELEVATION
+                            "Tilt (Panel)", PANEL_TILT_ID, PANEL_ELEVATION
                         ),
                     ]
                 ),
@@ -83,12 +85,12 @@ def pv_subsection() -> dbc.Container:
                             MODULE,
                             [MODULE],
                         ),
-                        dropdown_input("Case", CASE_ID, CASE, list(cached.data.cases.keys())),
+                        dropdown_input("Case", CASE_ID, CASE, list(TEMPERATURE_MODEL_PARAMETERS.keys())),
                         dropdown_input(
                             "Inverter",
                             INVERTER_ID,
                             INVERTER,
-                            list(cached.data.fetch_inverters().keys()),
+                            list(ram_cached.fetch_inverters().keys()),
                         ),
                     ]
                 ),

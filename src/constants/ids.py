@@ -7,14 +7,14 @@ ALTITUDE_ID = "altitude"
 # Map
 MAP_ID = "map"
 
-# House
-HOUSE_HEIGHT_ID = "house_height"
+# Roof
+ROOF_HEIGHT_ID = "house_height"
 ROOF_AZIMUTH_ID = "roof_azimuth"
 ROOF_TILT_ID = "roof_tilt"
 
 # Panel
 PANEL_AZIMUTH_ID = "panel_azimuth"
-PANEL_ELEVATION_ID = "panel_elevation"
+PANEL_TILT_ID = "panel_elevation"
 
 # Time
 TIME_ID = "time"
