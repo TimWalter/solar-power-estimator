@@ -104,6 +104,7 @@ def get_callbacks(app):
         running=[
             (Output(START_BUTTON_ID, "disabled"), True, False),
             (Output(CANCEL_BUTTON_ID, "disabled"), False, True),
+            (Output(FADE_CANCEL_BUTTON_ID, "is_in"), True, False),
             (Output(LOADING_ICON_ID, "hidden"), False, True),
             (Output(NON_LOADING_ID, "hidden"), True, False),
         ],

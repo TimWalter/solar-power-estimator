@@ -9,7 +9,7 @@ from constants.ids import *
 
 def horizontal_line():
     return html.Hr(
-        style={"borderTop": "1.5px solid #888", "width": "90%", "margin": "20px auto"}
+        style={"borderTop": "0.1vh solid #888", "width": "90%", "margin": "4vh auto"}
     )
 
 
@@ -36,7 +36,12 @@ def get_map(pos: Position) -> dcc.Graph:
         id=MAP_ID,
         figure=map_figure(pos),
         config={"autosizable": True, "scrollZoom": True},
-        style={"padding": 0},
+        style={
+            "padding": 0,
+            "background-color": "white",
+            "border-radius": "10px",
+            "box-shadow": "0px 0px 5px 2px rgba(0,0,0,0.1)",
+        },
     )
 
 
@@ -92,7 +97,7 @@ def progress_bar() -> dbc.Container:
                         id=PROGRESS_BAR_ID,
                         figure=progress_figure(0),
                         config={"displayModeBar": False},
-                        style={"border": "1px solid #888", "height": "10vh"},
+                        style={"border": "0.1vh solid #888", "height": "10vh"},
                     ),
                     width=10,
                     align="center",
@@ -118,5 +123,5 @@ def output_table(idx: str) -> dash_table.DataTable:
 
 def output_plot(idx: str) -> dcc.Graph:
     return dcc.Graph(
-        id=idx, figure=go.Figure(), style={"width": "100%", "height": "300px"}
+        id=idx, figure=go.Figure(), style={"width": "100%", "height": "30vh"}
     )

@@ -27,6 +27,7 @@ INVERTER_ID = "inverter"
 
 # Simulation
 START_BUTTON_ID = "start_button"
+FADE_CANCEL_BUTTON_ID = "fade_cancel_button"
 CANCEL_BUTTON_ID = "cancel_button"
 NON_LOADING_ID = "non_loading"
 LOADING_ICON_ID = "loading_icon"

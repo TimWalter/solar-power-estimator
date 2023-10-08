@@ -130,18 +130,20 @@ def control_section() -> dbc.Container:
             [
                 dbc.Col(
                     [
-                        dbc.Stack(
+                        dbc.Row(
                             [
-                                dbc.Button(
-                                    "Start Simulation",
-                                    id=START_BUTTON_ID,
-                                    disabled=False,
-                                ),
-                                dbc.Button(
-                                    "Cancel Simulation",
-                                    id=CANCEL_BUTTON_ID,
-                                    disabled=True,
-                                ),
+                                dbc.Col(
+                                    dbc.Button(
+                                        "Start Simulation",
+                                        id=START_BUTTON_ID,
+                                        disabled=False,
+                                    ), width=6),
+                                dbc.Col(
+                                    dbc.Fade(dbc.Button(
+                                        "Cancel Simulation",
+                                        id=CANCEL_BUTTON_ID,
+                                        disabled=True,
+                                    ), id=FADE_CANCEL_BUTTON_ID, is_in=False), width=6),
                             ]
                         ),
                     ],
@@ -162,7 +164,7 @@ def output_section() -> dbc.Container:
         [
             dbc.Label(
                 "Simulation Results",
-                style={"text-align": "left", "font-size": "30px"},
+                style={"text-align": "left", "font-size": "3vh  "},
             ),
             dbc.Stack(
                 [

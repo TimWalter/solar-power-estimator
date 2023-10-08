@@ -21,13 +21,14 @@ from dashboard.callbacks import get_callbacks, get_background_callback_manager
 
 
 # TODO ADD bootstrap theme (dark mode?)
-# TODO combine buttons and make cancel button dbc fade
-# TODO replace px with vh
 # TODO make layout pretty again
 # TODO consistent documentation
 # TODO fix all project errors
 # TODO proper readme
+
 # TODO show stats of modules and inverters
+# TODO make  searching for them  easier also more modules? also custom modules etc. where you just give stats
+# TODO allow the insertion of demand curves to adapt yield onto demand
 """
     def fetch_best_module(self) -> dict:
         best_key = ""
@@ -56,14 +57,15 @@ from dashboard.callbacks import get_callbacks, get_background_callback_manager
 """
 
 pio.templates.default = "plotly_white"
-external_stylesheets = [
-    "https://codepen.io/chriddyp/pen/bWLwgP.css",
-    dbc.themes.BOOTSTRAP,
-]
+external_stylesheets = [dbc.themes.SIMPLEX] # LUX
 
 app = Dash(
     __name__,
-    external_stylesheets=external_stylesheets,
+    external_stylesheets=[
+        #"/assets/sneat/core.css",
+        #"/assets/sneat/theme-default.css",
+        "/assets/sb-admin-2.css",
+    ],
     background_callback_manager=get_background_callback_manager(),
 )
 
