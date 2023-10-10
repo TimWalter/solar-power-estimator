@@ -35,13 +35,16 @@ def get_map(pos: Position) -> dcc.Graph:
     return dcc.Graph(
         id=MAP_ID,
         figure=map_figure(pos),
-        config={"autosizable": True, "scrollZoom": True},
-        style={
-            "padding": 0,
-            "background-color": "white",
-            "border-radius": "10px",
-            "box-shadow": "0px 0px 5px 2px rgba(0,0,0,0.1)",
+        config={
+            "autosizable": True,
+            "scrollZoom": True,
+            "modeBarButtonsToRemove": ["lasso2d", "select2d"],
         },
+        style={
+            "padding-top": "1vh",
+            "padding-bottom": "1vh",
+        },
+        className="transparent-modebar",
     )
 
 
@@ -58,7 +61,7 @@ def numerical_input(title: str, idx: str, initial_value: str) -> dbc.Container:
 def date_range_input(title: str, idx: str, initial_value: tuple) -> dbc.Container:
     return dbc.Container(
         [
-            dbc.Label(title),
+            dbc.Label(title, style={"margin-right": "2vh"}),
             dcc.DatePickerRange(
                 id=idx,
                 start_date=initial_value[0],
@@ -68,7 +71,7 @@ def date_range_input(title: str, idx: str, initial_value: tuple) -> dbc.Containe
                 max_date_allowed=datetime(2020, 12, 31),
             ),
         ],
-        fluid=True,
+        fluid=True, className="d-flex justify-content-center"
     )
 
 
@@ -114,10 +117,18 @@ def output_table(idx: str) -> dash_table.DataTable:
         id=idx,
         data=data.to_dict("records"),
         columns=columns,
-        style_cell={"textAlign": "right", "whiteSpace": "pre-line"},
+        style_cell={
+            "textAlign": "right",
+            "whiteSpace": "pre-line",
+            "font-family": "sans-serif",
+        },
         style_cell_conditional=[{"if": {"column_id": ""}, "textAlign": "left"}],
         style_as_list_view=True,
-        style_header={"border-top": "none"},
+        style_header={
+            "border-top": "none",
+            "font-family": "sans-serif",
+            "background-color": "white",
+        },
     )
 
 

@@ -8,7 +8,7 @@ from data import ram_cached
 
 
 def title() -> html.H1:
-    return html.H1("Solar Power Estimation")
+    return html.H1("Solar Power Estimation", style={"text-align": "center"})
 
 
 def location_subsection() -> dbc.Container:
@@ -72,9 +72,7 @@ def pv_subsection() -> dbc.Container:
                         numerical_input(
                             "Azimuth (Panel)", PANEL_AZIMUTH_ID, PANEL_AZIMUTH
                         ),
-                        numerical_input(
-                            "Tilt (Panel)", PANEL_TILT_ID, PANEL_ELEVATION
-                        ),
+                        numerical_input("Tilt (Panel)", PANEL_TILT_ID, PANEL_ELEVATION),
                     ]
                 ),
                 dbc.Col(
@@ -85,7 +83,12 @@ def pv_subsection() -> dbc.Container:
                             MODULE,
                             [MODULE],
                         ),
-                        dropdown_input("Case", CASE_ID, CASE, list(TEMPERATURE_MODEL_PARAMETERS["sapm"].keys())),
+                        dropdown_input(
+                            "Case",
+                            CASE_ID,
+                            CASE,
+                            list(TEMPERATURE_MODEL_PARAMETERS["sapm"].keys()),
+                        ),
                         dropdown_input(
                             "Inverter",
                             INVERTER_ID,
@@ -137,17 +140,25 @@ def control_section() -> dbc.Container:
                                         "Start Simulation",
                                         id=START_BUTTON_ID,
                                         disabled=False,
-                                    ), width=6),
+                                    ),
+                                    width={"size": 5, "offset": 2},
+                                ),
                                 dbc.Col(
-                                    dbc.Fade(dbc.Button(
-                                        "Cancel Simulation",
-                                        id=CANCEL_BUTTON_ID,
-                                        disabled=True,
-                                    ), id=FADE_CANCEL_BUTTON_ID, is_in=False), width=6),
+                                    dbc.Fade(
+                                        dbc.Button(
+                                            "Cancel Simulation",
+                                            id=CANCEL_BUTTON_ID,
+                                            disabled=True,
+                                        ),
+                                        id=FADE_CANCEL_BUTTON_ID,
+                                        is_in=False,
+                                    ),
+                                    width=5
+                                ),
                             ]
                         ),
                     ],
-                    width=2,
+                    width=2, align="center",
                 ),
                 dbc.Col(
                     progress_bar(),
@@ -182,7 +193,7 @@ def output_section() -> dbc.Container:
 def get_layout() -> dbc.Container:
     return dbc.Container(
         [
-            dbc.Row(dbc.Col(title())),
+            dbc.Row(dbc.Col(title()), justify="center"),
             dbc.Row(dbc.Col(input_section())),
             dbc.Row(dbc.Col(horizontal_line())),
             dbc.Row(dbc.Col(control_section())),

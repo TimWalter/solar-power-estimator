@@ -19,9 +19,6 @@ from dashboard.callbacks import get_callbacks, get_background_callback_manager
 
 # TODO FASTER website
 
-
-# TODO ADD bootstrap theme (dark mode?)
-# TODO make layout pretty again
 # TODO consistent documentation
 # TODO fix all project errors
 # TODO proper readme
@@ -57,14 +54,11 @@ from dashboard.callbacks import get_callbacks, get_background_callback_manager
 """
 
 pio.templates.default = "plotly_white"
-external_stylesheets = [dbc.themes.SIMPLEX] # LUX
 
 app = Dash(
     __name__,
     external_stylesheets=[
-        #"/assets/sneat/core.css",
-        #"/assets/sneat/theme-default.css",
-        "/assets/sb-admin-2.css",
+        dbc.themes.BOOTSTRAP,
     ],
     background_callback_manager=get_background_callback_manager(),
 )

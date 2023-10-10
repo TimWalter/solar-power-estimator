@@ -31,12 +31,7 @@ def map_figure(pos: Position) -> go.Figure:
             },
             "zoom": 12.5,
         },
-        margin={
-            "b": 0,
-            "t": 0,
-            "l": 0,
-            "r": 0,
-        },  # Set the bottom margin to zero to reduce space
+        margin={"r": 0, "t": 0, "l": 0, "b": 0},
     )
     return fig
 
