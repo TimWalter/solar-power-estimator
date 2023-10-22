@@ -4,7 +4,7 @@ import requests
 import pandas as pd
 from joblib import Memory
 
-from data.containter import Position, SimulationTime
+from data.containter import Position, TimeWindow
 from sec.keys import MAPTILER_API_KEY
 
 
@@ -25,7 +25,7 @@ def fetch_location(query: str) -> list:
 
 
 @memory.cache
-def fetch_radiation(pos: Position, time: SimulationTime) -> pd.Series:
+def fetch_radiation(pos: Position, time: TimeWindow) -> pd.Series:
     endpoint = "https://re.jrc.ec.europa.eu/api/v5_2/seriescalc"
     params = {
         "lat": pos.latitude,

@@ -1,193 +1,5 @@
-from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS
-
+from constants.custom_components import *
 from dashboard.elements import *
-from constants.defaults import *
-from constants.ids import *
-
-from data import ram_cached
-
-
-def title() -> html.H1:
-    return html.H1("Solar Power Estimation", style={"text-align": "center"})
-
-
-def location_subsection() -> dbc.Container:
-    return dbc.Container(
-        [
-            dbc.Row(
-                dbc.Col(
-                    dropdown_input(
-                        "Location",
-                        LOCATION_NAME_ID,
-                        LOCATION_NAME,
-                        [LOCATION_NAME],
-                    )
-                ),
-            ),
-            dbc.Row(dbc.Col(get_map(Position(LATITUDE, LONGITUDE, ALTITUDE)))),
-            dbc.Row(
-                [
-                    dbc.Col(
-                        numerical_input("Latitude", LATITUDE_ID, LATITUDE),
-                        width=3,
-                    ),
-                    dbc.Col(
-                        numerical_input("Longitude", LONGITUDE_ID, LONGITUDE),
-                        width=3,
-                    ),
-                    dbc.Col(
-                        numerical_input("Altitude", ALTITUDE_ID, ALTITUDE),
-                        width=3,
-                    ),
-                ],
-                justify="center",
-            ),
-        ],
-        fluid=True,
-    )
-
-
-def house_subsection() -> dbc.Container:
-    return dbc.Container(
-        [
-            numerical_input("Height (Roof)", ROOF_HEIGHT_ID, ROOF_HEIGHT),
-            numerical_input("Azimuth (Roof)", ROOF_AZIMUTH_ID, ROOF_AZIMUTH),
-            numerical_input("Tilt (Roof)", ROOF_TILT_ID, ROOF_TILT),
-        ],
-        fluid=True,
-    )
-
-
-def pv_subsection() -> dbc.Container:
-    return dbc.Container(
-        dbc.Row(
-            [
-                dbc.Col(
-                    [
-                        numerical_input(
-                            "Number of Panels",
-                            NUMBER_OF_MODULES_ID,
-                            NUMBER_OF_MODULES,
-                        ),
-                        numerical_input(
-                            "Azimuth (Panel)", PANEL_AZIMUTH_ID, PANEL_AZIMUTH
-                        ),
-                        numerical_input("Tilt (Panel)", PANEL_TILT_ID, PANEL_ELEVATION),
-                    ]
-                ),
-                dbc.Col(
-                    [
-                        dropdown_input(
-                            "Panel Type",
-                            MODULE_ID,
-                            MODULE,
-                            [MODULE],
-                        ),
-                        dropdown_input(
-                            "Case",
-                            CASE_ID,
-                            CASE,
-                            list(TEMPERATURE_MODEL_PARAMETERS["sapm"].keys()),
-                        ),
-                        dropdown_input(
-                            "Inverter",
-                            INVERTER_ID,
-                            INVERTER,
-                            list(ram_cached.fetch_inverters().keys()),
-                        ),
-                    ]
-                ),
-            ]
-        ),
-        fluid=True,
-    )
-
-
-def time_subsection() -> dbc.Container:
-    return date_range_input("Simulation time", TIME_ID, TIME)
-
-
-def input_section() -> dbc.Container:
-    return dbc.Container(
-        [
-            dbc.Row(dbc.Col(location_subsection())),
-            horizontal_line(),
-            dbc.Row(
-                [
-                    dbc.Col(
-                        house_subsection(), width=4, className="column_vertical_right"
-                    ),
-                    dbc.Col(pv_subsection(), width=8),
-                ]
-            ),
-            horizontal_line(),
-            dbc.Row(dbc.Col(time_subsection()), justify="center"),
-        ],
-        fluid=True,
-    )
-
-
-def control_section() -> dbc.Container:
-    return dbc.Container(
-        dbc.Row(
-            [
-                dbc.Col(
-                    [
-                        dbc.Row(
-                            [
-                                dbc.Col(
-                                    dbc.Button(
-                                        "Start Simulation",
-                                        id=START_BUTTON_ID,
-                                        disabled=False,
-                                    ),
-                                    width={"size": 5, "offset": 2},
-                                ),
-                                dbc.Col(
-                                    dbc.Fade(
-                                        dbc.Button(
-                                            "Cancel Simulation",
-                                            id=CANCEL_BUTTON_ID,
-                                            disabled=True,
-                                        ),
-                                        id=FADE_CANCEL_BUTTON_ID,
-                                        is_in=False,
-                                    ),
-                                    width=5
-                                ),
-                            ]
-                        ),
-                    ],
-                    width=2, align="center",
-                ),
-                dbc.Col(
-                    progress_bar(),
-                    width=10,
-                ),
-            ]
-        ),
-        fluid=True,
-    )
-
-
-def output_section() -> dbc.Container:
-    return dbc.Container(
-        [
-            dbc.Label(
-                "Simulation Results",
-                style={"text-align": "left", "font-size": "3vh  "},
-            ),
-            dbc.Stack(
-                [
-                    output_table(OUTPUT_TABLE_ID),
-                    output_plot(OUTPUT_GRAPH_1_ID),
-                    output_plot(OUTPUT_GRAPH_2_ID),
-                    output_plot(OUTPUT_GRAPH_3_ID),
-                ]
-            ),
-        ],
-        fluid=True,
-    )
 
 
 def get_layout() -> dbc.Container:
@@ -203,5 +15,117 @@ def get_layout() -> dbc.Container:
         style={
             "padding": "5vh",
         },
+        fluid=True,
+    )
+
+
+def input_section() -> dbc.Container:
+    return dbc.Container(
+        [
+            dbc.Row(dbc.Col(location_subsection())),
+            horizontal_line(),
+            dbc.Row(dbc.Col(simulation_time_daterangepicker()), justify="center"),
+            horizontal_line(),
+            dbc.Row(dbc.Col(pv_subsection())),
+        ],
+        fluid=True,
+    )
+
+
+def location_subsection() -> dbc.Container:
+    return dbc.Container(
+        [
+            dbc.Row(dbc.Col(location_dropdown())),
+            dbc.Row(dbc.Col(map_graph())),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        latitude_input(),
+                        width=3,
+                    ),
+                    dbc.Col(
+                        longitude_input(),
+                        width=3,
+                    ),
+                    dbc.Col(
+                        altitude_input(),
+                        width=3,
+                    ),
+                ],
+                justify="center",
+            ),
+        ],
+        fluid=True,
+    )
+
+
+def pv_subsection() -> dbc.Container:
+    return dbc.Container(
+        [
+            dbc.Row(
+                [
+                    dbc.Col(panel_manufacturer_dropdown()),
+                    dbc.Col(panel_series_dropdown()),
+                    dbc.Col(panel_model_dropdown()),
+                ]
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(case_dropdown()),
+                    dbc.Col(number_of_modules_input()),
+                ]
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(tilt_input()),
+                    dbc.Col(azimuth_input()),
+                    dbc.Col(bipartite_input()),
+                ],
+                align="end",
+            ),
+            dbc.Row([
+                dbc.Col(inverter_manufacturer_dropdown()),
+                dbc.Col(inverter_series_dropdown()),
+                dbc.Col(inverter_model_dropdown()),
+            ]),
+        ],
+        fluid=True,
+    )
+
+
+def control_section() -> dbc.Container:
+    return dbc.Container(
+        dbc.Row(
+            [
+                dbc.Col(
+                    [
+                        dbc.Row(
+                            [
+                                dbc.Col(start_button(), width={"size": 5, "offset": 2}),
+                                dbc.Col(cancel_button(), width=5),
+                            ]
+                        ),
+                    ],
+                    width=2,
+                    align="center",
+                ),
+                dbc.Col(progress_bar(), width=10),
+            ]
+        ),
+        fluid=True,
+    )
+
+
+def output_section() -> dbc.Container:
+    return dbc.Container(
+        [
+            result_label(),
+            dbc.Stack(
+                [
+                    output_table(),
+                    output_plot(),
+                ]
+            ),
+        ],
         fluid=True,
     )

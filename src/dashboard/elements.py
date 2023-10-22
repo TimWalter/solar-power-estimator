@@ -1,40 +1,34 @@
 from dash import html, dcc, dash_table
 import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
+from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS
 
-from dashboard.figures import get_empty_table, progress_figure, map_figure
+
+from dashboard.figures import (
+    map_figure,
+    progress_figure,
+    get_table_columns,
+    get_graph_figure,
+)
+from constants.ids import ids
+from constants.defaults import *
+from constants.custom_components import *
 from data.containter import *
-from constants.ids import *
+from data import ram_cached
 
 
-def horizontal_line():
-    return html.Hr(
-        style={"borderTop": "0.1vh solid #888", "width": "90%", "margin": "4vh auto"}
-    )
+def title() -> html.H1:
+    return html.H1("Solar Power Estimation", style={"text-align": "center"})
 
 
-def dropdown_input(
-    title: str, idx: str, default_value: str, options: list
-) -> dbc.Container:
-    return dbc.Container(
-        [
-            dbc.Label(title),
-            dcc.Dropdown(
-                id=idx,
-                options=options,
-                value=default_value,
-                searchable=True,
-                clearable=False,
-            ),
-        ],
-        fluid=True,
-    )
+def location_dropdown() -> dbc.Container:
+    return labelled_dropdown("Location", ids.input.location.name, [LOCATION], LOCATION)
 
 
-def get_map(pos: Position) -> dcc.Graph:
+def map_graph() -> dcc.Graph:
     return dcc.Graph(
-        id=MAP_ID,
-        figure=map_figure(pos),
+        id=ids.input.location.map,
+        figure=map_figure(LATITUDE, LONGITUDE),
         config={
             "autosizable": True,
             "scrollZoom": True,
@@ -48,30 +42,208 @@ def get_map(pos: Position) -> dcc.Graph:
     )
 
 
-def numerical_input(title: str, idx: str, initial_value: str) -> dbc.Container:
-    return dbc.Container(
-        [
-            dbc.Label(title),
-            dbc.Input(id=idx, type="number", value=initial_value),
-        ],
-        fluid=True,
-    )
+def latitude_input() -> dbc.Container:
+    return labelled_number_input("Latitude", ids.input.location.latitude, LATITUDE)
 
 
-def date_range_input(title: str, idx: str, initial_value: tuple) -> dbc.Container:
+def longitude_input() -> dbc.Container:
+    return labelled_number_input("Longitude", ids.input.location.longitude, LONGITUDE)
+
+
+def altitude_input() -> dbc.Container:
+    return labelled_number_input("Altitude", ids.input.location.altitude, ALTITUDE)
+
+
+def simulation_time_daterangepicker() -> dbc.Container:
     return dbc.Container(
         [
-            dbc.Label(title, style={"margin-right": "2vh"}),
+            dbc.Label("Simulation time", style={"margin-right": "2vh"}),
             dcc.DatePickerRange(
-                id=idx,
-                start_date=initial_value[0],
-                end_date=initial_value[1],
+                id=ids.input.time,
+                start_date=TIME[0],
+                end_date=TIME[1],
                 display_format="DD.MM.YYYY",
                 min_date_allowed=datetime(2005, 1, 1),
                 max_date_allowed=datetime(2020, 12, 31),
             ),
         ],
-        fluid=True, className="d-flex justify-content-center"
+        fluid=True,
+        className="d-flex justify-content-center",
+    )
+
+
+def panel_manufacturer_dropdown() -> dbc.Container:
+    return labelled_dropdown(
+        "Panel Manufacturer",
+        ids.input.pv.panel.manufacturer,
+        list(ram_cached.fetch_modules().keys()),
+        PANEL_MANUFACTURER,
+    )
+
+
+def panel_series_dropdown() -> dbc.Container:
+    return labelled_dropdown(
+        "Panel Series",
+        ids.input.pv.panel.series,
+        list(ram_cached.fetch_modules()[PANEL_MANUFACTURER].keys()),
+        PANEL_SERIES,
+    )
+
+
+def panel_model_dropdown() -> dbc.Container:
+    return labelled_dropdown(
+        "Panel Model",
+        ids.input.pv.panel.model,
+        list(ram_cached.fetch_modules()[PANEL_MANUFACTURER][PANEL_SERIES].keys()),
+        PANEL_MODEL,
+    )
+
+
+def case_dropdown() -> dbc.Container:
+    return labelled_dropdown(
+        "Case",
+        ids.input.pv.case,
+        list(TEMPERATURE_MODEL_PARAMETERS["sapm"].keys()),
+        CASE,
+    )
+
+
+def number_of_modules_input() -> dbc.Container:
+    return labelled_number_input(
+        "Number of modules", ids.input.pv.number_of_modules, NUMBER_OF_MODULES
+    )
+
+
+def tilt_input() -> dbc.Container:
+    return labelled_optimizable_number_input(
+        "Tilt",
+        ids.input.pv.tilt.radio,
+        OPT_TILT,
+        ids.input.pv.tilt.fix.collapse,
+        ids.input.pv.tilt.fix.input,
+        TILT,
+        ids.input.pv.tilt.constrain.collapse,
+        ids.input.pv.tilt.constrain.min,
+        0,
+        ids.input.pv.tilt.constrain.max,
+        90,
+    )
+
+
+def azimuth_input() -> dbc.Container:
+    return labelled_optimizable_number_input(
+        "Azimuth",
+        ids.input.pv.azimuth.radio,
+        OPT_AZIMUTH,
+        ids.input.pv.azimuth.fix.collapse,
+        ids.input.pv.azimuth.fix.input,
+        AZIMUTH,
+        ids.input.pv.azimuth.constrain.collapse,
+        ids.input.pv.azimuth.constrain.min,
+        0,
+        ids.input.pv.azimuth.constrain.max,
+        360,
+    )
+
+
+def bipartite_input() -> dbc.Container:
+    return dbc.Container(
+        dbc.Row(
+            [
+                dbc.Col(
+                    dbc.Button(
+                        "Bipartite",
+                        id=ids.input.pv.bipartite.button,
+                        active=BIPARTITE,
+                    ),
+                    width=4,
+                ),
+                dbc.Col(
+                    dbc.Collapse(
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    dbc.Input(
+                                        id=ids.input.pv.bipartite.side1,
+                                        type="number",
+                                        value=NUMBER_OF_MODULES,
+                                    ),
+                                    width=6,
+                                ),
+                                dbc.Col(
+                                    dbc.Input(
+                                        id=ids.input.pv.bipartite.side2,
+                                        type="number",
+                                        value=0,
+                                        disabled=True,
+                                    ),
+                                    width=6,
+                                ),
+                            ]
+                        ),
+                        id=ids.input.pv.bipartite.collapse,
+                        is_open=BIPARTITE,
+                    ),
+                    width=8,
+                ),
+            ]
+        ),
+        fluid=True,
+    )
+
+
+def inverter_manufacturer_dropdown() -> dbc.Container:
+    return labelled_dropdown(
+        "Inverter Manufacturer",
+        ids.input.pv.inverter.manufacturer,
+        list(ram_cached.fetch_inverters().keys()),
+        INVERTER_MANUFACTURER,
+    )
+
+
+def inverter_series_dropdown() -> dbc.Container:
+    return labelled_dropdown(
+        "Inverter Series",
+        ids.input.pv.inverter.series,
+        list(ram_cached.fetch_inverters()[INVERTER_MANUFACTURER].keys()),
+        INVERTER_SERIES,
+    )
+
+
+def inverter_model_dropdown() -> dbc.Container:
+    return labelled_dropdown(
+        "Inverter Model",
+        ids.input.pv.inverter.model,
+        list(
+            ram_cached.fetch_inverters()[INVERTER_MANUFACTURER][INVERTER_SERIES].keys()
+        ),
+        INVERTER_MODEL,
+    )
+
+
+def start_button() -> dbc.Container:
+    return dbc.Container(
+        dbc.Button(
+            "Start Simulation",
+            id=ids.control.start,
+            disabled=False,
+        ),
+        fluid=True,
+    )
+
+
+def cancel_button() -> dbc.Container:
+    return dbc.Container(
+        dbc.Fade(
+            dbc.Button(
+                "Cancel Simulation",
+                id=ids.control.cancel.button,
+                disabled=True,
+            ),
+            id=ids.control.cancel.fade,
+            is_in=False,
+        ),
+        fluid=True,
     )
 
 
@@ -80,7 +252,7 @@ def progress_bar() -> dbc.Container:
         dbc.Row(
             [
                 dbc.Col(
-                    html.Div(id=NON_LOADING_ID),
+                    html.Div(id=ids.control.loading.placeholder),
                     width=1,
                     align=("center",),
                 ),
@@ -88,7 +260,7 @@ def progress_bar() -> dbc.Container:
                     html.Img(
                         src=r"../assets/loading_icon.gif",
                         alt="image",
-                        id=LOADING_ICON_ID,
+                        id=ids.control.loading.gif,
                         hidden=False,
                         style={"padding": 10, "width": "100%", "max-height": "100%"},
                     ),
@@ -97,7 +269,7 @@ def progress_bar() -> dbc.Container:
                 ),
                 dbc.Col(
                     dcc.Graph(
-                        id=PROGRESS_BAR_ID,
+                        id=ids.control.progress_bar,
                         figure=progress_figure(0),
                         config={"displayModeBar": False},
                         style={"border": "0.1vh solid #888", "height": "10vh"},
@@ -110,13 +282,18 @@ def progress_bar() -> dbc.Container:
     )
 
 
-def output_table(idx: str) -> dash_table.DataTable:
-    data, columns = get_empty_table()
+def result_label() -> dbc.Label:
+    return dbc.Label(
+        "Simulation Results",
+        style={"text-align": "left", "font-size": "3vh  "},
+    )
 
+
+def output_table() -> dash_table.DataTable:
     return dash_table.DataTable(
-        id=idx,
-        data=data.to_dict("records"),
-        columns=columns,
+        id=ids.output.table,
+        data=[{}],
+        columns=get_table_columns(PV()),
         style_cell={
             "textAlign": "right",
             "whiteSpace": "pre-line",
@@ -132,7 +309,9 @@ def output_table(idx: str) -> dash_table.DataTable:
     )
 
 
-def output_plot(idx: str) -> dcc.Graph:
+def output_plot() -> dcc.Graph:
     return dcc.Graph(
-        id=idx, figure=go.Figure(), style={"width": "100%", "height": "30vh"}
+        id=ids.output.graph,
+        figure=get_graph_figure(PV()),
+        style={"width": "100%", "height": "30vh"},
     )

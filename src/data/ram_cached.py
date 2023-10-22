@@ -1,4 +1,4 @@
-import pvlib
+import json
 from dataclasses import dataclass
 
 
@@ -13,15 +13,13 @@ ram_cache = RAMCache()
 
 def fetch_modules() -> dict:
     if ram_cache.modules is None:
-        ram_cache.modules = pvlib.pvsystem.retrieve_sam(
-            "CECMod", path="../../data/CEC Modules.csv"
-        )
+        with open("data/panel_database.json", "r") as file:
+            ram_cache.modules = json.load(file)
     return ram_cache.modules
 
 
 def fetch_inverters() -> dict:
     if ram_cache.inverter is None:
-        ram_cache.inverter = pvlib.pvsystem.retrieve_sam(
-            "CECinverter", path="../../data/CEC Inverters.csv"
-        )
+        with open("data/inverter_database.json", "r") as file:
+            ram_cache.inverter = json.load(file)
     return ram_cache.inverter

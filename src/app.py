@@ -1,66 +1,60 @@
+import os
 import plotly.io as pio
-from dash import Dash
-import dash_bootstrap_components as dbc
+from dash import Dash, CeleryManager, DiskcacheManager
+from dash_bootstrap_components import themes
 
 from dashboard.layout import get_layout
-from dashboard.callbacks import get_callbacks, get_background_callback_manager
+from dashboard.callbacks import get_callbacks
 
 # TODO nicer map with zoom, compass etc.as connect to map?
 # TODO select place by map
 
 # TODO wrap the site to not have to scroll?
-# TODO sync plots
 
-# TODO checkbox for given 2 sided for given setup
-# TODO checkbox for optimization
-# TODO checkbox for which parameters shall be fixed for optimization (azimuth or tilt) in gneeral optimization shall be customizalbe
-# TODO overhall optimization, choice of one-sided or two-sided not both all the time etc.
 # TODO introduce a rotational panel that is optimized for every hour to perfectly follow the sun
+# TODO allow the insertion of demand curves to adapt yield onto demand
 
-# TODO FASTER website
+
+# TODO accordion for setup? pagination? input groups?
+# TODO use dbc progress instead of custom same for loading, same for table
+# TODO Add validation and remove type constraints to get rid of increment stuff
 
 # TODO consistent documentation
-# TODO fix all project errors
 # TODO proper readme
 
+# TODO overhaul inverter and panel to split into manufacturers etc and give custom option
+# TODO introduce other library
 # TODO show stats of modules and inverters
 # TODO make  searching for them  easier also more modules? also custom modules etc. where you just give stats
-# TODO allow the insertion of demand curves to adapt yield onto demand
-"""
-    def fetch_best_module(self) -> dict:
-        best_key = ""
-        best_stat = 0
-        for key in self.fetch_modules():
-            module = self.modules[key]
-            stats = module["I_mp_ref"] * module["V_mp_ref"] / module["A_c"]
-            if stats > best_stat and module["Technology"] == "Mono-c-Si":
-                best_key = key
-                best_stat = stats
-        result = self.modules[best_key]
-        result["name"] = best_key
-        return result
 
-    def fetch_fitting_inverter(self, module: dict, number_of_modules: int) -> dict:
-        single_max_power = module["I_mp_ref"] * module["V_mp_ref"]
-        for key in self.fetch_inverters():
-            inverter = self.inverter[key]
-            min_power_condition = inverter["Pso"] <= single_max_power
-            max_power_condition = (
-                inverter["Pdco"] >= single_max_power * number_of_modules
-            )
-            manufacturer_condition = "SMA" in key
-            if min_power_condition and max_power_condition and manufacturer_condition:
-                return inverter
-"""
+# TODO allow save/caching of various results
+# TODO allow comparison of different runs
+# TODO refactor (especially elements), also ids (group them), elements come with callbacks
+# TODO instead of initial collapse state do not prevent initial callback
+
+if "REDIS_URL" in os.environ:
+    # Use Redis & Celery if REDIS_URL set as an env variable
+    from celery import Celery
+
+    celery_app = Celery(
+        __name__, broker=os.environ["REDIS_URL"], backend=os.environ["REDIS_URL"]
+    )
+    background_callback_manager = CeleryManager(celery_app)
+else:
+    # Diskcache for non-production apps when developing locally
+    import diskcache
+
+    cache = diskcache.Cache("./cache")
+    background_callback_manager = DiskcacheManager(cache)
 
 pio.templates.default = "plotly_white"
 
 app = Dash(
     __name__,
     external_stylesheets=[
-        dbc.themes.BOOTSTRAP,
+        themes.BOOTSTRAP,
     ],
-    background_callback_manager=get_background_callback_manager(),
+    background_callback_manager=background_callback_manager,
 )
 
 app.layout = get_layout()
