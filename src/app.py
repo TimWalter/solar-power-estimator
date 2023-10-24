@@ -22,7 +22,7 @@ from dashboard.callbacks import get_callbacks
 # TODO consistent documentation
 # TODO proper readme
 
-# TODO overhaul inverter and panel to split into manufacturers etc and give custom option
+# TODO overhaul inverter and panel to give custom option and show parameters
 # TODO introduce other library
 # TODO show stats of modules and inverters
 # TODO make  searching for them  easier also more modules? also custom modules etc. where you just give stats
