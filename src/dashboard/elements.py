@@ -99,6 +99,128 @@ def panel_model_dropdown() -> dbc.Container:
     )
 
 
+def panel_stats() -> dbc.Accordion:
+    default_panel = ram_cached.fetch_modules()[PANEL_MANUFACTURER][PANEL_SERIES][
+        PANEL_MODEL
+    ]
+    return dbc.Accordion(
+        [
+            dbc.AccordionItem(
+                [
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                labelled_input_group(
+                                    [
+                                        "Maximum power point voltage (V",
+                                        html.Sub("mp"),
+                                        ") [V]",
+                                    ],
+                                    ids.input.pv.panel.stats.v_mp,
+                                    default_panel["V_mp_ref"],
+                                ),
+                            ),
+                            dbc.Col(
+                                labelled_input_group(
+                                    [
+                                        "Maximum power point current (I",
+                                        html.Sub("mp"),
+                                        ") [A]",
+                                    ],
+                                    ids.input.pv.panel.stats.i_mp,
+                                    default_panel["I_mp_ref"],
+                                ),
+                            ),
+                            dbc.Col(
+                                labelled_input_group(
+                                    [
+                                        "Open circuit voltage (V",
+                                        html.Sub("oc"),
+                                        ") [V]",
+                                    ],
+                                    ids.input.pv.panel.stats.v_oc,
+                                    default_panel["V_oc_ref"],
+                                ),
+                            ),
+                            dbc.Col(
+                                labelled_input_group(
+                                    [
+                                        "Short circuit current (I",
+                                        html.Sub("sc"),
+                                        ") [A]",
+                                    ],
+                                    ids.input.pv.panel.stats.i_sc,
+                                    default_panel["I_sc_ref"],
+                                ),
+                            ),
+                        ]
+                    ),
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                labelled_input_group(
+                                    [
+                                        "Temperature coefficient of open circuit voltage (T",
+                                        html.Sub(["V", html.Sub("oc")]),
+                                        ") [V/°C]",
+                                    ],
+                                    ids.input.pv.panel.stats.t_v_oc,
+                                    default_panel["beta_oc"],
+                                ),
+                            ),
+                            dbc.Col(
+                                labelled_input_group(
+                                    [
+                                        "Temperature coefficient of short circuit current (T",
+                                        html.Sub(["V", html.Sub("sc")]),
+                                        ") [A/°C]",
+                                    ],
+                                    ids.input.pv.panel.stats.t_i_sc,
+                                    default_panel["alpha_sc"],
+                                ),
+                            ),
+                            dbc.Col(
+                                labelled_input_group(
+                                    [
+                                        "Temperature coefficient of maximum power point voltage (T",
+                                        html.Sub(["V", html.Sub("mp")]),
+                                        ") [V/°C]",
+                                    ],
+                                    ids.input.pv.panel.stats.t_p_mp,
+                                    default_panel["gamma_r"],
+                                ),
+                            ),
+                        ]
+                    ),
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                labelled_input_group(
+                                    ["Technology"],
+                                    ids.input.pv.panel.stats.technology,
+                                    default_panel["Technology"],
+                                    "text"
+                                ),
+                            ),
+                            dbc.Col(
+                                labelled_input_group(
+                                    ["Number of cells in series"],
+                                    ids.input.pv.panel.stats.n_cells_series,
+                                    default_panel["N_s"],
+                                ),
+                            ),
+                        ]
+                    ),
+                ],
+                title="Panel Stats",
+                id=ids.input.pv.panel.stats.accordion,
+            )
+        ],
+        flush=True,
+        start_collapsed=True,
+    )
+
+
 def case_dropdown() -> dbc.Container:
     return labelled_dropdown(
         "Case",

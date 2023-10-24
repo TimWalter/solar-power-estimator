@@ -69,6 +69,7 @@ def pv_subsection() -> dbc.Container:
                     dbc.Col(panel_model_dropdown()),
                 ]
             ),
+            dbc.Row(dbc.Col(panel_stats())),
             dbc.Row(
                 [
                     dbc.Col(case_dropdown()),

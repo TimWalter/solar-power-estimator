@@ -24,6 +24,21 @@ class ID:
                 series: str = "pv_panel_series"
                 model: str = "pv_panel_model"
 
+                @dataclass
+                class PanelStats:
+                    accordion: str = "pv_panel_panel_stats_accordion"
+                    v_mp: str = "pv_panel_panel_stats_v_mp"
+                    i_mp: str = "pv_panel_panel_stats_i_mp"
+                    v_oc: str = "pv_panel_panel_stats_v_oc"
+                    i_sc: str = "pv_panel_panel_stats_i_sc"
+                    t_v_oc: str = "pv_panel_panel_stats_t_v_oc"
+                    t_i_sc: str = "pv_panel_panel_stats_t_i_sc"
+                    t_p_mp: str = "pv_panel_panel_stats_t_p_mp"
+                    technology: str = "pv_panel_panel_stats_technology"
+                    n_cells_series: str = "pv_panel_panel_stats_n_cells_series"
+
+                stats: PanelStats = field(default_factory=PanelStats)
+
             panel: Panel = field(default_factory=Panel)
             case: str = "pv_case"
             number_of_modules: str = "pv_number_of_modules"

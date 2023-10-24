@@ -42,6 +42,17 @@ def horizontal_line():
     )
 
 
+def labelled_input_group(
+    title: list, input_id: str, initial_value: str, type="number"
+) -> dbc.FormFloating:
+    return dbc.FormFloating(
+        [
+            dbc.Input(id=input_id, type=type, value=initial_value),
+            dbc.Label(title),
+        ]
+    )
+
+
 def labelled_optimizable_number_input(
     title: str,
     radio_id: str,
