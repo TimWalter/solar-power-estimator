@@ -32,7 +32,6 @@ from dashboard.callbacks import get_callbacks
 # TODO instead of initial collapse state do not prevent initial callback
 # TODO refactor panel stats
 # TODO refactor custom callbacks
-# TODO refactor defaults
 
 
 if "REDIS_URL" in os.environ:

@@ -1,8 +1,6 @@
 import json
 import pvlib
 
-from data.containter import PVSystemData, ProductIdentifier
-
 
 class RAMCache:
     def __init__(self):
@@ -27,7 +25,7 @@ class RAMCache:
     def inverters(self) -> dict:
         return self._fetch("inverter")
 
-    def _save(self, name: str, product_identifier: ProductIdentifier, data: dict):
+    def _save(self, name: str, product_identifier, data: dict):
         database = self._fetch(name)
         try:
             database[product_identifier.manufacturer][product_identifier.series][product_identifier.model]
@@ -41,7 +39,7 @@ class RAMCache:
             with open(f"data/{name}_database.json", "w") as file:
                 json.dump(database, file, indent=4)
 
-    def save_panel(self, panel: PVSystemData.Module.Panel):
+    def save_panel(self, panel):
         i_l_ref, i_o_ref, r_s, r_sh_ref, a_ref, adjust = pvlib.ivtools.sdm.fit_cec_sam(*panel.stats)
         data = {
             **panel.stats.to_cec(),
@@ -54,7 +52,7 @@ class RAMCache:
         }
         self._save("panel", panel, data)
 
-    def save_inverter(self, inverter: PVSystemData.Inverter):
+    def save_inverter(self, inverter):
         self._save("inverter", inverter, inverter.stats.to_cec())
 
 

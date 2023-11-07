@@ -1,10 +1,9 @@
 from dash import dash_table
 
-from constants.defaults import defaults
 from constants.ids import ids
 from dashboard.components import *
 from dashboard.figures import *
-from data.containter import *
+from constants.containter import *
 from data.ram_cached import ram_cache
 
 
@@ -14,17 +13,14 @@ def title() -> html.H1:
 
 def location_dropdown() -> dbc.Container:
     return labelled_dropdown(
-        "Location",
-        ids.input.location.name,
-        [defaults.location.name],
-        defaults.location.name
+        "Location", ids.input.location.name, [Location().name], Location().name
     )
 
 
 def map_graph() -> dcc.Graph:
     return dcc.Graph(
         id=ids.input.location.map,
-        figure=map_figure(defaults.location.latitude, defaults.location.longitude),
+        figure=map_figure(Location().latitude, Location().longitude),
         config={
             "autosizable": True,
             "scrollZoom": True,
@@ -39,27 +35,17 @@ def map_graph() -> dcc.Graph:
 
 
 def latitude_input() -> dbc.Container:
-    return labelled_input(
-        "Latitude",
-        ids.input.location.latitude,
-        defaults.location.latitude
-    )
+    return labelled_input("Latitude", ids.input.location.latitude, Location().latitude)
 
 
 def longitude_input() -> dbc.Container:
     return labelled_input(
-        "Longitude",
-        ids.input.location.longitude,
-        defaults.location.longitude
+        "Longitude", ids.input.location.longitude, Location().longitude
     )
 
 
 def altitude_input() -> dbc.Container:
-    return labelled_input(
-        "Altitude",
-        ids.input.location.altitude,
-        defaults.location.altitude
-    )
+    return labelled_input("Altitude", ids.input.location.altitude, Location().altitude)
 
 
 def simulation_time_daterangepicker() -> dbc.Container:
@@ -68,8 +54,8 @@ def simulation_time_daterangepicker() -> dbc.Container:
             dbc.Label("Simulation time", style={"margin-right": "2vh"}),
             dcc.DatePickerRange(
                 id=ids.input.time,
-                start_date=defaults.datetime_range.start,
-                end_date=defaults.datetime_range.end,
+                start_date=DateTimeRange.start,
+                end_date=DateTimeRange.end,
                 display_format="DD.MM.YYYY",
                 min_date_allowed=datetime(2005, 1, 1),
                 max_date_allowed=datetime(2020, 12, 31),
@@ -85,7 +71,7 @@ def panel_manufacturer_dropdown() -> dbc.Container:
         "Panel Manufacturer",
         ids.input.pv.panel.manufacturer,
         list(ram_cache.panels.keys()),
-        defaults.pv.module.panel.manufacturer,
+        PVSystemData.Module.Panel.manufacturer,
         store_id=ids.input.pv.panel.custom.manufacturer_store,
     )
 
@@ -94,8 +80,8 @@ def panel_series_dropdown() -> dbc.Container:
     return labelled_dropdown(
         "Panel Series",
         ids.input.pv.panel.series,
-        list(ram_cache.panels[defaults.pv.module.panel.manufacturer].keys()),
-        defaults.pv.module.panel.series,
+        list(ram_cache.panels[PVSystemData.Module.Panel.manufacturer].keys()),
+        PVSystemData.Module.Panel.series,
         store_id=ids.input.pv.panel.custom.series_store,
     )
 
@@ -104,8 +90,12 @@ def panel_model_dropdown() -> dbc.Container:
     return labelled_dropdown(
         "Panel Model",
         ids.input.pv.panel.model,
-        list(ram_cache.panels[defaults.pv.module.panel.manufacturer][defaults.pv.module.panel.series].keys()),
-        defaults.pv.module.panel.model,
+        list(
+            ram_cache.panels[PVSystemData.Module.Panel.manufacturer][
+                PVSystemData.Module.Panel.series
+            ].keys()
+        ),
+        PVSystemData.Module.Panel.model,
         store_id=ids.input.pv.panel.custom.model_store,
     )
 
@@ -144,8 +134,9 @@ def saved_custom_panel_alert() -> dbc.Alert:
 
 
 def panel_stats() -> dbc.Accordion:
-    default_panel = ram_cache.panels[defaults.pv.module.panel.manufacturer][defaults.pv.module.panel.series][
-        defaults.pv.module.panel.model]
+    default_panel = ram_cache.panels[PVSystemData.Module.Panel.manufacturer][
+        PVSystemData.Module.Panel.series
+    ][PVSystemData.Module.Panel.model]
     return dbc.Accordion(
         [
             dbc.AccordionItem(
@@ -274,13 +265,15 @@ def case_dropdown() -> dbc.Container:
         "Case",
         ids.input.pv.case,
         [case.name for case in Cases],
-        defaults.pv.module.case.name,
+        PVSystemData.Module.case.name,
     )
 
 
 def number_of_modules_input() -> dbc.Container:
     return labelled_input(
-        "Number of modules", ids.input.pv.number_of_modules, defaults.pv.number_of_modules
+        "Number of modules",
+        ids.input.pv.number_of_modules,
+        len(PVSystemData.modules),
     )
 
 
@@ -291,7 +284,7 @@ def tilt_input() -> dbc.Container:
         OptimizationState.Fix,
         ids.input.pv.tilt.fix.collapse,
         ids.input.pv.tilt.fix.input,
-        defaults.pv.module.tilt,
+        PVSystemData.Module.tilt,
         ids.input.pv.tilt.constrain.collapse,
         ids.input.pv.tilt.constrain.min,
         0,
@@ -307,7 +300,7 @@ def azimuth_input() -> dbc.Container:
         OptimizationState.Fix,
         ids.input.pv.azimuth.fix.collapse,
         ids.input.pv.azimuth.fix.input,
-        defaults.pv.module.azimuth,
+        PVSystemData.Module.azimuth,
         ids.input.pv.azimuth.constrain.collapse,
         ids.input.pv.azimuth.constrain.min,
         0,
@@ -324,7 +317,7 @@ def bipartite_input() -> dbc.Container:
                     dbc.Button(
                         "Bipartite",
                         id=ids.input.pv.bipartite.button,
-                        active=False,
+                        active=PVSystemData.bipartite,
                     ),
                     width=4,
                 ),
@@ -336,7 +329,7 @@ def bipartite_input() -> dbc.Container:
                                     dbc.Input(
                                         id=ids.input.pv.bipartite.side1,
                                         type="number",
-                                        value=defaults.pv.number_of_modules,
+                                        value=PVSystemData.side1,
                                     ),
                                     width=6,
                                 ),
@@ -344,7 +337,7 @@ def bipartite_input() -> dbc.Container:
                                     dbc.Input(
                                         id=ids.input.pv.bipartite.side2,
                                         type="number",
-                                        value=0,
+                                        value=PVSystemData.side2,
                                         disabled=True,
                                     ),
                                     width=6,
@@ -367,7 +360,7 @@ def inverter_manufacturer_dropdown() -> dbc.Container:
         "Inverter Manufacturer",
         ids.input.pv.inverter.manufacturer,
         list(ram_cache.inverters.keys()),
-        defaults.pv.inverter.manufacturer,
+        PVSystemData.Inverter.manufacturer,
         store_id=ids.input.pv.inverter.custom.manufacturer_store,
     )
 
@@ -376,8 +369,8 @@ def inverter_series_dropdown() -> dbc.Container:
     return labelled_dropdown(
         "Inverter Series",
         ids.input.pv.inverter.series,
-        list(ram_cache.inverters[defaults.pv.inverter.manufacturer].keys()),
-        defaults.pv.inverter.series,
+        list(ram_cache.inverters[PVSystemData.Inverter.manufacturer].keys()),
+        PVSystemData.Inverter.series,
         store_id=ids.input.pv.inverter.custom.series_store,
     )
 
@@ -387,9 +380,11 @@ def inverter_model_dropdown() -> dbc.Container:
         "Inverter Model",
         ids.input.pv.inverter.model,
         list(
-            ram_cache.inverters[defaults.pv.inverter.manufacturer][defaults.pv.inverter.series].keys()
+            ram_cache.inverters[PVSystemData.Inverter.manufacturer][
+                PVSystemData.Inverter.series
+            ].keys()
         ),
-        defaults.pv.inverter.model,
+        PVSystemData.Inverter.model,
         store_id=ids.input.pv.inverter.custom.model_store,
     )
 
@@ -428,108 +423,121 @@ def saved_custom_inverter_alert() -> dbc.Alert:
 
 
 def inverter_stats() -> dbc.Accordion:
-    default_inverter = ram_cache.inverters[defaults.pv.inverter.manufacturer][defaults.pv.inverter.series][
-        defaults.pv.inverter.model]
-    return dbc.Accordion([
-        dbc.AccordionItem([
-            dbc.Row([
-                dbc.Col(
-                    labelled_input_group(
-                        ["P", html.Sub("ac_o")],
-                        "AC power rating of the inverter",
-                        "W",
-                        ids.input.pv.inverter.stats.paco,
-                        default_inverter["Paco"],
-                        disabled=True,
+    default_inverter = ram_cache.inverters[PVSystemData.Inverter.manufacturer][
+        PVSystemData.Inverter.series
+    ][PVSystemData.Inverter.model]
+    return dbc.Accordion(
+        [
+            dbc.AccordionItem(
+                [
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                labelled_input_group(
+                                    ["P", html.Sub("ac_o")],
+                                    "AC power rating of the inverter",
+                                    "W",
+                                    ids.input.pv.inverter.stats.paco,
+                                    default_inverter["Paco"],
+                                    disabled=True,
+                                ),
+                            ),
+                            dbc.Col(
+                                labelled_input_group(
+                                    ["P", html.Sub("dc_o")],
+                                    "DC power input that results in Paco output at reference voltage Vdco",
+                                    "W",
+                                    ids.input.pv.inverter.stats.pdco,
+                                    default_inverter["Pdco"],
+                                    disabled=True,
+                                ),
+                            ),
+                            dbc.Col(
+                                labelled_input_group(
+                                    ["V", html.Sub("dc_o")],
+                                    "DC voltage at which the AC power rating is achieved with Pdco power input",
+                                    "V",
+                                    ids.input.pv.inverter.stats.vdco,
+                                    default_inverter["Vdco"],
+                                    disabled=True,
+                                ),
+                            ),
+                            dbc.Col(
+                                labelled_input_group(
+                                    ["P", html.Sub("s_o")],
+                                    "DC power required to start the inversion process, or self-consumption by inverter",
+                                    "W",
+                                    ids.input.pv.inverter.stats.pso,
+                                    default_inverter["Pso"],
+                                    disabled=True,
+                                ),
+                            ),
+                        ]
                     ),
-                ),
-                dbc.Col(
-                    labelled_input_group(
-                        ["P", html.Sub("dc_o")],
-                        "DC power input that results in Paco output at reference voltage Vdco",
-                        "W",
-                        ids.input.pv.inverter.stats.pdco,
-                        default_inverter["Pdco"],
-                        disabled=True,
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                labelled_input_group(
+                                    ["C", html.Sub("0")],
+                                    "Parameter defining the curvature (parabolic) of the relationship between AC power and DC power at the reference operating condition",
+                                    "1/V",
+                                    ids.input.pv.inverter.stats.c0,
+                                    default_inverter["C0"],
+                                    disabled=True,
+                                ),
+                            ),
+                            dbc.Col(
+                                labelled_input_group(
+                                    ["C", html.Sub("1")],
+                                    "Empirical coefficient allowing Pdco to vary linearly with DC voltage input",
+                                    "1/V",
+                                    ids.input.pv.inverter.stats.c1,
+                                    default_inverter["C1"],
+                                    disabled=True,
+                                ),
+                            ),
+                            dbc.Col(
+                                labelled_input_group(
+                                    ["C", html.Sub("2")],
+                                    "Empirical coefficient allowing Pso to vary linearly with DC voltage input",
+                                    "1/V",
+                                    ids.input.pv.inverter.stats.c2,
+                                    default_inverter["C2"],
+                                    disabled=True,
+                                ),
+                            ),
+                            dbc.Col(
+                                labelled_input_group(
+                                    ["C", html.Sub("3")],
+                                    "Empirical coefficient allowing C0 to vary linearly with DC voltage input",
+                                    "1/V",
+                                    ids.input.pv.inverter.stats.c3,
+                                    default_inverter["C3"],
+                                    disabled=True,
+                                ),
+                            ),
+                        ]
                     ),
-                ),
-                dbc.Col(
-                    labelled_input_group(
-                        ["V", html.Sub("dc_o")],
-                        "DC voltage at which the AC power rating is achieved with Pdco power input",
-                        "V",
-                        ids.input.pv.inverter.stats.vdco,
-                        default_inverter["Vdco"],
-                        disabled=True,
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                dbc.Col(
+                                    labelled_input_group(
+                                        ["P", html.Sub("nt")],
+                                        "AC power consumed by the inverter at night (night tare)",
+                                        "W",
+                                        ids.input.pv.inverter.stats.pnt,
+                                        default_inverter["Pnt"],
+                                        disabled=True,
+                                    ),
+                                ),
+                            ),
+                        ]
                     ),
-                ),
-                dbc.Col(
-                    labelled_input_group(
-                        ["P", html.Sub("s_o")],
-                        "DC power required to start the inversion process, or self-consumption by inverter",
-                        "W",
-                        ids.input.pv.inverter.stats.pso,
-                        default_inverter["Pso"],
-                        disabled=True,
-                    ),
-                )
-            ]),
-            dbc.Row([
-                dbc.Col(
-                    labelled_input_group(
-                        ["C", html.Sub("0")],
-                        "Parameter defining the curvature (parabolic) of the relationship between AC power and DC power at the reference operating condition",
-                        "1/V",
-                        ids.input.pv.inverter.stats.c0,
-                        default_inverter["C0"],
-                        disabled=True,
-                    ),
-                ),
-                dbc.Col(
-                    labelled_input_group(
-                        ["C", html.Sub("1")],
-                        "Empirical coefficient allowing Pdco to vary linearly with DC voltage input",
-                        "1/V",
-                        ids.input.pv.inverter.stats.c1,
-                        default_inverter["C1"],
-                        disabled=True,
-                    ),
-                ),
-                dbc.Col(
-                    labelled_input_group(
-                        ["C", html.Sub("2")],
-                        "Empirical coefficient allowing Pso to vary linearly with DC voltage input",
-                        "1/V",
-                        ids.input.pv.inverter.stats.c2,
-                        default_inverter["C2"],
-                        disabled=True,
-                    ),
-                ),
-                dbc.Col(
-                    labelled_input_group(
-                        ["C", html.Sub("3")],
-                        "Empirical coefficient allowing C0 to vary linearly with DC voltage input",
-                        "1/V",
-                        ids.input.pv.inverter.stats.c3,
-                        default_inverter["C3"],
-                        disabled=True,
-                    ),
-                ),
-            ]),
-            dbc.Row([
-                dbc.Col(dbc.Col(
-                    labelled_input_group(
-                        ["P", html.Sub("nt")],
-                        "AC power consumed by the inverter at night (night tare)",
-                        "W",
-                        ids.input.pv.inverter.stats.pnt,
-                        default_inverter["Pnt"],
-                        disabled=True,
-                    ),
-                ), ),
-            ]),
-        ], title="Inverter Stats")
-    ],
+                ],
+                title="Inverter Stats",
+            )
+        ],
         id=ids.input.pv.inverter.stats.accordion,
         flush=True,
         start_collapsed=True,
@@ -627,6 +635,8 @@ def output_table() -> dash_table.DataTable:
 def output_plot() -> dcc.Graph:
     return dcc.Graph(
         id=ids.output.graph,
-        figure=get_graph_figure(defaults.pv.bipartite, defaults.pv.side1, defaults.pv.side2),
+        figure=get_graph_figure(
+            PVSystemData.bipartite, PVSystemData.side1, PVSystemData.side2
+        ),
         style={"width": "100%", "height": "30vh"},
     )

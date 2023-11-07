@@ -3,7 +3,7 @@ from pvlib.pvsystem import PVSystem, Array, FixedMount
 from pvlib.location import Location
 from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS
 
-from data.containter import *
+from constants.containter import *
 from data.ram_cached import ram_cache
 
 
@@ -15,10 +15,8 @@ def construct_pvsystem(system_data: PVSystemData):
         arrays.append(
             Array(
                 mount=FixedMount(
-                    surface_azimuth=system_data.azimuth
-                    if i < system_data.side1
-                    else (system_data.azimuth + 180) % 360,
-                    surface_tilt=system_data.tilt,
+                    surface_azimuth=module.azimuth,
+                    surface_tilt=module.tilt,
                 ),
                 module_parameters=panel,
                 temperature_model_parameters=temperature_model_parameters,
@@ -36,4 +34,4 @@ def simulate(location: Location, pv: PVSystemData, radiation) -> Result:
 
     mc = ModelChain(system, location, aoi_model="physical", spectral_model="no_loss")
     mc.run_model([radiation] * len(system.arrays))
-    return Result(mc.results, pv.tilt, pv.azimuth)
+    return Result(mc.results, pv.modules[0].tilt, pv.modules[0].azimuth)

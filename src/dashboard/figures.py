@@ -4,8 +4,7 @@ import numpy as np
 import plotly.graph_objs as go
 from dash.dash_table.Format import Format, Scheme, Symbol
 
-from constants.enums import *
-from data.containter import *
+from constants.containter import *
 from sec.keys import MAPBOX_API_KEY
 
 

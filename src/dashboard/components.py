@@ -32,7 +32,7 @@ def labelled_dropdown(
 def labelled_input(
         title: str,
         input_id: str,
-        initial_value: str,
+        initial_value: int,
         placeholder: str = None,
         input_type: str = "number",
 ) -> dbc.Container:

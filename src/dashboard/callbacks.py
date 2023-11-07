@@ -6,7 +6,7 @@ from constants.ids import ids
 from dashboard.figures import get_table_data, get_table_columns, get_graph_figure
 from dashboard.figures import progress_figure, map_figure
 from data.altitude_provider import altitude_provider
-from data.containter import *
+from constants.containter import *
 from data.ram_cached import ram_cache
 from optimization import optimize
 from simulation import simulate
@@ -60,50 +60,50 @@ def get_callbacks(app):
         prevent_initial_callback=True,
     )
     def start_simulation(
-            set_progress,
-            n_clicks,
-            latitude,
-            longitude,
-            altitude,
-            panel_manufacturer,
-            panel_series,
-            panel_model,
-            v_mp,
-            i_mp,
-            v_oc,
-            i_sc,
-            t_v_oc,
-            t_i_sc,
-            t_p_mp,
-            technology,
-            n_cells_series,
-            case,
-            number_of_modules,
-            bipartite,
-            side1,
-            side2,
-            opt_tilt,
-            tilt,
-            min_tilt,
-            max_tilt,
-            opt_azimuth,
-            azimuth,
-            min_azimuth,
-            max_azimuth,
-            inverter_manufacturer,
-            inverter_series,
-            inverter_model,
-            paco,
-            pdco,
-            vdco,
-            pso,
-            c0,
-            c1,
-            c2,
-            c3,
-            pnt,
-            start_str,
-            end_str,
+        set_progress,
+        n_clicks,
+        latitude,
+        longitude,
+        altitude,
+        panel_manufacturer,
+        panel_series,
+        panel_model,
+        v_mp,
+        i_mp,
+        v_oc,
+        i_sc,
+        t_v_oc,
+        t_i_sc,
+        t_p_mp,
+        technology,
+        n_cells_series,
+        case,
+        number_of_modules,
+        bipartite,
+        side1,
+        side2,
+        opt_tilt,
+        tilt,
+        min_tilt,
+        max_tilt,
+        opt_azimuth,
+        azimuth,
+        min_azimuth,
+        max_azimuth,
+        inverter_manufacturer,
+        inverter_series,
+        inverter_model,
+        paco,
+        pdco,
+        vdco,
+        pso,
+        c0,
+        c1,
+        c2,
+        c3,
+        pnt,
+        start_str,
+        end_str,
     ):
         if n_clicks is None:
             return no_update, no_update
@@ -115,30 +115,33 @@ def get_callbacks(app):
         )
 
         pv = PVSystemData(
-            modules=[PVSystemData.Module(
-                panel=PVSystemData.Module.Panel(
-                    manufacturer=panel_manufacturer,
-                    series=panel_series,
-                    model=panel_model,
-                    stats=PVSystemData.Module.Panel.Stats(
-                        cell_type=CellType.from_cec(technology),
-                        v_mp=v_mp,
-                        i_mp=i_mp,
-                        v_oc=v_oc,
-                        i_sc=i_sc,
-                        t_v_oc=t_v_oc,
-                        t_i_sc=t_i_sc,
-                        t_p_mp=t_p_mp,
-                        n_cells_series=n_cells_series,
-                    )
-                ),
-                case=Cases[case],
-            )] * number_of_modules,
+            modules=[
+                PVSystemData.Module(
+                    panel=PVSystemData.Module.Panel(
+                        manufacturer=panel_manufacturer,
+                        series=panel_series,
+                        model=panel_model,
+                        stats=PVSystemData.Module.Panel.Stats(
+                            cell_type=CellType.from_cec(technology),
+                            v_mp=v_mp,
+                            i_mp=i_mp,
+                            v_oc=v_oc,
+                            i_sc=i_sc,
+                            t_v_oc=t_v_oc,
+                            t_i_sc=t_i_sc,
+                            t_p_mp=t_p_mp,
+                            n_cells_series=n_cells_series,
+                        ),
+                    ),
+                    case=Cases[case],
+                    tilt=tilt if not bipartite or i < side1 else tilt + 180 % 360,
+                    azimuth=azimuth if not bipartite or i < side1 else azimuth + 180 % 360,
+                )
+                for i in range(number_of_modules)
+            ],
             bipartite=bipartite,
             side1=side1,
             side2=side2,
-            tilt=tilt,
-            azimuth=azimuth,
             inverter=PVSystemData.Inverter(
                 manufacturer=inverter_manufacturer,
                 series=inverter_series,
@@ -154,11 +157,13 @@ def get_callbacks(app):
                     c3=c3,
                     p_nt=pnt,
                 ),
-            )
+            ),
         )
 
         tilt_info = OptimizableVariable(tilt, min_tilt, max_tilt, opt_tilt)
-        azimuth_info = OptimizableVariable(azimuth, min_azimuth, max_azimuth, opt_azimuth)
+        azimuth_info = OptimizableVariable(
+            azimuth, min_azimuth, max_azimuth, opt_azimuth
+        )
 
         # Step 1: Fetch Data
         radiation = data.disk_cached.fetch_radiation(pos, time)
@@ -240,9 +245,7 @@ def get_pv_callbacks(app):
             except KeyError:
                 series_options = [] if not custom else [series]
             try:
-                model_options = list(
-                    data[manufacturer][series].keys()
-                )
+                model_options = list(data[manufacturer][series].keys())
             except KeyError:
                 model_options = [] if not custom else [model]
             try:
@@ -257,8 +260,16 @@ def get_pv_callbacks(app):
                 *stats,
             )
 
-    synchronize_component(ids.input.pv.panel, ram_cache.panels, PVSystemData.Module.Panel.Stats(*([None] * 9)).to_cec().keys())
-    synchronize_component(ids.input.pv.inverter, ram_cache.inverters, PVSystemData.Inverter.Stats(*([None] * 9)).to_cec().keys())
+    synchronize_component(
+        ids.input.pv.panel,
+        ram_cache.panels,
+        PVSystemData.Module.Panel.Stats(*([None] * 9)).to_cec().keys(),
+    )
+    synchronize_component(
+        ids.input.pv.inverter,
+        ram_cache.inverters,
+        PVSystemData.Inverter.Stats(*([None] * 9)).to_cec().keys(),
+    )
 
     def get_dropdown_as_text_input(app, idx, idx_store, idx_button, duplicate=False):
         @app.callback(
@@ -286,20 +297,47 @@ def get_pv_callbacks(app):
                 return options, query
             return no_update, no_update
 
-    get_dropdown_as_text_input(app, ids.input.pv.panel.manufacturer, ids.input.pv.panel.custom.manufacturer_store,
-                               ids.input.pv.panel.custom.button)
-    get_dropdown_as_text_input(app, ids.input.pv.panel.series, ids.input.pv.panel.custom.series_store,
-                               ids.input.pv.panel.custom.button, True)
-    get_dropdown_as_text_input(app, ids.input.pv.panel.model, ids.input.pv.panel.custom.model_store,
-                               ids.input.pv.panel.custom.button, True)
+    get_dropdown_as_text_input(
+        app,
+        ids.input.pv.panel.manufacturer,
+        ids.input.pv.panel.custom.manufacturer_store,
+        ids.input.pv.panel.custom.button,
+    )
+    get_dropdown_as_text_input(
+        app,
+        ids.input.pv.panel.series,
+        ids.input.pv.panel.custom.series_store,
+        ids.input.pv.panel.custom.button,
+        True,
+    )
+    get_dropdown_as_text_input(
+        app,
+        ids.input.pv.panel.model,
+        ids.input.pv.panel.custom.model_store,
+        ids.input.pv.panel.custom.button,
+        True,
+    )
 
-    get_dropdown_as_text_input(app, ids.input.pv.inverter.manufacturer,
-                               ids.input.pv.inverter.custom.manufacturer_store,
-                               ids.input.pv.inverter.custom.button)
-    get_dropdown_as_text_input(app, ids.input.pv.inverter.series, ids.input.pv.inverter.custom.series_store,
-                               ids.input.pv.inverter.custom.button, True)
-    get_dropdown_as_text_input(app, ids.input.pv.inverter.model, ids.input.pv.inverter.custom.model_store,
-                               ids.input.pv.inverter.custom.button, True)
+    get_dropdown_as_text_input(
+        app,
+        ids.input.pv.inverter.manufacturer,
+        ids.input.pv.inverter.custom.manufacturer_store,
+        ids.input.pv.inverter.custom.button,
+    )
+    get_dropdown_as_text_input(
+        app,
+        ids.input.pv.inverter.series,
+        ids.input.pv.inverter.custom.series_store,
+        ids.input.pv.inverter.custom.button,
+        True,
+    )
+    get_dropdown_as_text_input(
+        app,
+        ids.input.pv.inverter.model,
+        ids.input.pv.inverter.custom.model_store,
+        ids.input.pv.inverter.custom.button,
+        True,
+    )
 
     def get_toggle_button_callback(app, idx):
         @app.callback(
@@ -346,11 +384,11 @@ def get_pv_callbacks(app):
             prevent_initial_callback=True,
         )
         def save_custom_panel(
-                n_clicks,
-                manufacturer,
-                series,
-                model,
-                *stats,
+            n_clicks,
+            manufacturer,
+            series,
+            model,
+            *stats,
         ):
             if n_clicks is None:
                 return no_update
@@ -412,11 +450,11 @@ def get_output_callbacks(app):
         State(ids.input.pv.bipartite.side2, "value"),
         prevent_initial_call="initial_duplicate",
     )
-    def adapt_outputs(tilt_optimization_state, azimuth_optimization_state, bipartite, side1, side2):
+    def adapt_outputs(
+        tilt_optimization_state, azimuth_optimization_state, bipartite, side1, side2
+    ):
         return get_table_columns(
             OptimizationState(tilt_optimization_state),
             OptimizationState(azimuth_optimization_state),
-            bipartite
-        ), get_graph_figure(bipartite,
-                            side1,
-                            side2)
+            bipartite,
+        ), get_graph_figure(bipartite, side1, side2)
