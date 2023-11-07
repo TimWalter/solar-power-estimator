@@ -86,7 +86,6 @@ class AltitudeProvider:
         )
         y_offset = max(0, min(tile_data.shape[0] - 1, y_offset))
 
-        image_data_index = y_offset * (tile_data.shape[1] * 4) + x_offset * 4
         red = tile_data[y_offset, x_offset, 0]
         green = tile_data[y_offset, x_offset, 1]
         blue = tile_data[y_offset, x_offset, 2]

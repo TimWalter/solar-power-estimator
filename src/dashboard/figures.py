@@ -1,10 +1,10 @@
-from typing import List, Tuple
+from typing import List
 
 import numpy as np
-import pandas as pd
 import plotly.graph_objs as go
 from dash.dash_table.Format import Format, Scheme, Symbol
 
+from constants.enums import *
 from data.containter import *
 from sec.keys import MAPBOX_API_KEY
 
@@ -68,7 +68,7 @@ def progress_figure(progress):
     return progress_graph
 
 
-def get_table_columns(pv: PV) -> list:
+def get_table_columns(tilt_state: OptimizationState, azimuth_state: OptimizationState, bipartite: bool) -> list:
     angle_format = Format(
         precision=2, scheme=Scheme.fixed, symbol=Symbol.yes, symbol_suffix="˚"
     )
@@ -80,11 +80,11 @@ def get_table_columns(pv: PV) -> list:
         {"name": "Total AC [kWh]", "format": power_format},
         {"name": "Total DC [kWh]", "format": power_format},
     ]
-    if pv.opt_tilt != OptimizationState.Fix:
+    if tilt_state != OptimizationState.Fix:
         columns.append({"name": "Tilt [˚]", "format": angle_format})
-    if pv.opt_azimuth != OptimizationState.Fix:
+    if azimuth_state != OptimizationState.Fix:
         columns.append({"name": "Azimuth [˚]", "format": angle_format})
-    if pv.bipartite:
+    if bipartite:
         columns.append({"name": f"1. Side - Total DC [kWh]", "format": power_format})
         columns.append({"name": f"2. Side - Total DC [kWh]", "format": power_format})
         columns.append({"name": f"1. Side - DC/Panel [kWh]", "format": power_format})
@@ -98,17 +98,18 @@ def get_table_columns(pv: PV) -> list:
     return columns
 
 
-def get_table_data(pv: PV, result: Result) -> List[dict]:
-    columns = get_table_columns(pv)
-    show_tilt = pv.opt_tilt != OptimizationState.Fix
-    show_azimuth = pv.opt_azimuth != OptimizationState.Fix
+def get_table_data(pv: PVSystemData, result: Result, tilt_info: OptimizableVariable,
+                   azimuth_info: OptimizableVariable) -> List[dict]:
+    columns = get_table_columns(tilt_info.state, azimuth_info.state, pv.bipartite)
+    show_tilt = tilt_info.state != OptimizationState.Fix
+    show_azimuth = azimuth_info.state != OptimizationState.Fix
     data = {}
     for i, col in enumerate(columns):
         if i == 0:
             data[col["name"]] = result.output.ac.sum() / 1000
         elif i == 1:
             data[col["name"]] = (
-                np.sum([r["p_mp"].sum() for r in result.output.dc]) / 1000
+                    np.sum([r["p_mp"].sum() for r in result.output.dc]) / 1000
             )
         elif i == 2 and show_tilt:
             data[col["name"]] = result.tilt
@@ -116,38 +117,38 @@ def get_table_data(pv: PV, result: Result) -> List[dict]:
             data[col["name"]] = result.azimuth
         elif i == 2 + show_tilt + show_azimuth and pv.bipartite:
             data[col["name"]] = (
-                np.sum([r["p_mp"].sum() for r in result.output.dc[: pv.side1]]) / 1000
+                    np.sum([r["p_mp"].sum() for r in result.output.dc[: pv.side1]]) / 1000
             )
         elif i == 3 + show_tilt + show_azimuth and pv.bipartite:
             data[col["name"]] = (
-                np.sum([r["p_mp"].sum() for r in result.output.dc[pv.side1 :]]) / 1000
+                    np.sum([r["p_mp"].sum() for r in result.output.dc[pv.side1:]]) / 1000
             )
         elif i == 4 + show_tilt + show_azimuth and pv.bipartite:
             data[col["name"]] = (
-                np.sum([r["p_mp"].sum() for r in result.output.dc[: pv.side1]])
-                / pv.side1
-                / 1000
+                    np.sum([r["p_mp"].sum() for r in result.output.dc[: pv.side1]])
+                    / pv.modules[0].panel.side1
+                    / 1000
             )
         elif i == 5 + show_tilt + show_azimuth and pv.bipartite:
             data[col["name"]] = (
-                np.sum([r["p_mp"].sum() for r in result.output.dc[pv.side1 :]])
-                / pv.side2
-                / 1000
+                    np.sum([r["p_mp"].sum() for r in result.output.dc[pv.side1:]])
+                    / pv.modules[0].panel.side2
+                    / 1000
             )
 
     return [data]
 
 
-def get_graph_figure(pv: PV, result: Result = None) -> go.Figure:
+def get_graph_figure(bipartite: bool, side1: int, side2: int, result: Result = None) -> go.Figure:
     fig = go.Figure()
 
     fig.add_trace(AC_figure(result))
     fig.add_trace(DC_figure(result))
     fig.add_trace(AC_minus_DC_figure(result))
-    if pv.bipartite:
-        fig.add_trace(side1_figure(pv, result))
-        fig.add_trace(side2_figure(pv, result))
-        fig.add_trace(bipartite_differential_figure(pv, result))
+    if bipartite:
+        fig.add_trace(side1_figure(side1, result))
+        fig.add_trace(side2_figure(side1, side2, result))
+        fig.add_trace(bipartite_differential_figure(side1, side2, result))
 
     fig.update_layout(
         # title=dict(text="", y=0.9, x=0.5, xanchor="center", yanchor="top"),
@@ -191,7 +192,7 @@ def AC_minus_DC_figure(result: Result = None) -> go.Scatter:
     return go.Scatter(
         x=result.output.times if result is not None else [0],
         y=(result.output.ac - np.sum([r["p_mp"] for r in result.output.dc], axis=0))
-        / 1000
+          / 1000
         if result is not None
         else [0],
         name="AC - DC",
@@ -200,12 +201,12 @@ def AC_minus_DC_figure(result: Result = None) -> go.Scatter:
     )
 
 
-def side1_figure(pv: PV, result: Result = None) -> go.Scatter:
+def side1_figure(side1: int, result: Result = None) -> go.Scatter:
     return go.Scatter(
         x=result.output.times if result is not None else [0],
-        y=np.sum([r["p_mp"] for r in result.output.dc[: pv.side1]], axis=0)
-        / pv.side1
-        / 1000
+        y=np.sum([r["p_mp"] for r in result.output.dc[: side1]], axis=0)
+          / side1
+          / 1000
         if result is not None
         else [0],
         name="1. Side / Panel",
@@ -214,12 +215,12 @@ def side1_figure(pv: PV, result: Result = None) -> go.Scatter:
     )
 
 
-def side2_figure(pv: PV, result: Result = None) -> go.Scatter:
+def side2_figure(side1: int, side2: int, result: Result = None) -> go.Scatter:
     return go.Scatter(
         x=result.output.times if result is not None else [0],
-        y=np.sum([r["p_mp"] for r in result.output.dc[pv.side1 :]], axis=0)
-        / pv.side2
-        / 1000
+        y=np.sum([r["p_mp"] for r in result.output.dc[side1:]], axis=0)
+          / side2
+          / 1000
         if result is not None
         else [0],
         name="2. Side / Panel",
@@ -228,15 +229,15 @@ def side2_figure(pv: PV, result: Result = None) -> go.Scatter:
     )
 
 
-def bipartite_differential_figure(pv: PV, result: Result = None) -> go.Scatter:
+def bipartite_differential_figure(side1: int, side2: int, result: Result = None) -> go.Scatter:
     return go.Scatter(
         x=result.output.times if result is not None else [0],
-        y=np.sum([r["p_mp"] for r in result.output.dc[: pv.side1]], axis=0)
-        / pv.side1
-        / 1000
-        - np.sum([r["p_mp"] for r in result.output.dc[pv.side1 :]], axis=0)
-        / pv.side2
-        / 1000
+        y=np.sum([r["p_mp"] for r in result.output.dc[: side1]], axis=0)
+          / side1
+          / 1000
+          - np.sum([r["p_mp"] for r in result.output.dc[side1:]], axis=0)
+          / side2
+          / 1000
         if result is not None
         else [0],
         name="1. Side / Panel - 2. Side / Panel",

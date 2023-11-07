@@ -25,7 +25,19 @@ class ID:
                 model: str = "pv_panel_model"
 
                 @dataclass
-                class PanelStats:
+                class Custom:
+                    button: str = "pv_panel_custom_button"
+                    save: str = "pv_panel_save_custom_button"
+                    fade: str = "pv_panel_custom_fade"
+                    success: str = "pv_panel_custom_success"
+                    manufacturer_store: str = "pv_panel_custom_manufacturer_store"
+                    series_store: str = "pv_panel_custom_series_store"
+                    model_store: str = "pv_panel_custom_model_store"
+
+                custom: Custom = field(default_factory=Custom)
+
+                @dataclass
+                class Stats:
                     accordion: str = "pv_panel_panel_stats_accordion"
                     v_mp: str = "pv_panel_panel_stats_v_mp"
                     i_mp: str = "pv_panel_panel_stats_i_mp"
@@ -37,7 +49,7 @@ class ID:
                     technology: str = "pv_panel_panel_stats_technology"
                     n_cells_series: str = "pv_panel_panel_stats_n_cells_series"
 
-                stats: PanelStats = field(default_factory=PanelStats)
+                stats: Stats = field(default_factory=Stats)
 
             panel: Panel = field(default_factory=Panel)
             case: str = "pv_case"
@@ -101,6 +113,33 @@ class ID:
                 manufacturer: str = "pv_inverter_manufacturer"
                 series: str = "pv_inverter_series"
                 model: str = "pv_inverter_model"
+
+                @dataclass
+                class Custom:
+                    button: str = "pv_inverter_custom_button"
+                    save: str = "pv_inverter_save_custom_button"
+                    fade: str = "pv_inverter_custom_fade"
+                    success: str = "pv_inverter_custom_success"
+                    manufacturer_store: str = "pv_inverter_custom_manufacturer_store"
+                    series_store: str = "pv_inverter_custom_series_store"
+                    model_store: str = "pv_inverter_custom_model_store"
+
+                custom: Custom = field(default_factory=Custom)
+
+                @dataclass
+                class Stats:
+                    accordion: str = "pv_inverter_inverter_stats_accordion"
+                    paco: str = "pv_inverter_inverter_stats_paco"
+                    pdco: str = "pv_inverter_inverter_stats_pdco"
+                    vdco: str = "pv_inverter_inverter_stats_vdco"
+                    pso: str = "pv_inverter_inverter_stats_pso"
+                    c0: str = "pv_inverter_inverter_stats_c0"
+                    c1: str = "pv_inverter_inverter_stats_c1"
+                    c2: str = "pv_inverter_inverter_stats_c2"
+                    c3: str = "pv_inverter_inverter_stats_c3"
+                    pnt: str = "pv_inverter_inverter_stats_pnt"
+
+                stats: Stats = field(default_factory=Stats)
 
             inverter: Inverter = field(default_factory=Inverter)
 

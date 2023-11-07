@@ -5,31 +5,45 @@ from constants.enums import OptimizationState
 
 
 def labelled_dropdown(
-    title: str, input_id: str, options: list, value: str
+        label: str,
+        input_id: str,
+        options: list,
+        value: str,
+        disabled: bool = False,
+        store_id: str = None
 ) -> dbc.Container:
     return dbc.Container(
         [
-            dbc.Label(title),
+            dbc.Label(label),
             dcc.Dropdown(
                 id=input_id,
                 options=options,
                 value=value,
                 searchable=True,
                 clearable=False,
+                disabled=disabled,
             ),
+            dcc.Store(id=store_id) if store_id else None,
         ],
         fluid=True,
     )
 
 
-def labelled_number_input(
-    title: str, input_id: str, initial_value: str, placeholder: str = None
+def labelled_input(
+        title: str,
+        input_id: str,
+        initial_value: str,
+        placeholder: str = None,
+        input_type: str = "number",
 ) -> dbc.Container:
     return dbc.Container(
         [
             dbc.Label(title),
             dbc.Input(
-                id=input_id, type="number", value=initial_value, placeholder=placeholder
+                id=input_id,
+                type=input_type,
+                value=initial_value,
+                placeholder=placeholder
             ),
         ],
         fluid=True,
@@ -43,28 +57,43 @@ def horizontal_line():
 
 
 def labelled_input_group(
-    title: list, input_id: str, initial_value: str, type="number"
-) -> dbc.FormFloating:
-    return dbc.FormFloating(
+        symbol: list,
+        description: str,
+        unit: str,
+        input_id: str,
+        initial_value: str,
+        type="number",
+        disabled=False,
+) -> dbc.InputGroup:
+    return dbc.InputGroup(
         [
-            dbc.Input(id=input_id, type=type, value=initial_value),
-            dbc.Label(title),
-        ]
+            dbc.InputGroupText(symbol),
+            dbc.FormFloating(
+                [
+                    dbc.Input(
+                        id=input_id, type=type, value=initial_value, disabled=disabled
+                    ),
+                    dbc.Label(description),
+                ]
+            ),
+            dbc.InputGroupText(unit),
+        ],
+        className="mb-3",
     )
 
 
 def labelled_optimizable_number_input(
-    title: str,
-    radio_id: str,
-    radio_value: OptimizationState,
-    fix_collapse_id: str,
-    fix_input_id: str,
-    fix_input_value: float,
-    constrain_collapse_id: str,
-    constrain_min_id: str,
-    constrain_min_value: float,
-    constrain_max_id: str,
-    constrain_max_value: float,
+        title: str,
+        radio_id: str,
+        radio_value: OptimizationState,
+        fix_collapse_id: str,
+        fix_input_id: str,
+        fix_input_value: float,
+        constrain_collapse_id: str,
+        constrain_min_id: str,
+        constrain_min_value: float,
+        constrain_max_id: str,
+        constrain_max_value: float,
 ) -> dbc.Container:
     return dbc.Container(
         [
@@ -127,11 +156,11 @@ def collapse_input(input_id: str, input_value: float, collapse_id: str) -> dbc.C
 
 
 def collapse_double_input(
-    collapse_id: str,
-    input1_id: str,
-    input1_value: float,
-    input2_id: str,
-    input2_value: float,
+        collapse_id: str,
+        input1_id: str,
+        input1_value: float,
+        input2_id: str,
+        input2_value: float,
 ) -> dbc.Collapse:
     return dbc.Collapse(
         [

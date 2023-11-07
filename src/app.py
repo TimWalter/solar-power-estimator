@@ -1,12 +1,12 @@
 import os
 import plotly.io as pio
 from dash import Dash, CeleryManager, DiskcacheManager
-from dash_bootstrap_components import themes
+from dash_bootstrap_components import themes, icons
 
 from dashboard.layout import get_layout
 from dashboard.callbacks import get_callbacks
 
-# TODO nicer map with zoom, compass etc.as connect to map?
+# TODO nicer map with zoom, compass etc.as connect to map? (movable point and than just translate its location)
 # TODO select place by map
 
 # TODO wrap the site to not have to scroll?
@@ -22,15 +22,18 @@ from dashboard.callbacks import get_callbacks
 # TODO consistent documentation
 # TODO proper readme
 
-# TODO overhaul inverter and panel to give custom option and show parameters
+# TODO overhaul inverter to give custom option and show parameters
 # TODO introduce other library
 # TODO show stats of modules and inverters
-# TODO make  searching for them  easier also more modules? also custom modules etc. where you just give stats
 
 # TODO allow save/caching of various results
 # TODO allow comparison of different runs
 # TODO refactor (especially elements), also ids (group them), elements come with callbacks
 # TODO instead of initial collapse state do not prevent initial callback
+# TODO refactor panel stats
+# TODO refactor custom callbacks
+# TODO refactor defaults
+
 
 if "REDIS_URL" in os.environ:
     # Use Redis & Celery if REDIS_URL set as an env variable
@@ -51,9 +54,7 @@ pio.templates.default = "plotly_white"
 
 app = Dash(
     __name__,
-    external_stylesheets=[
-        themes.BOOTSTRAP,
-    ],
+    external_stylesheets=[themes.BOOTSTRAP, icons.BOOTSTRAP],
     background_callback_manager=background_callback_manager,
 )
 

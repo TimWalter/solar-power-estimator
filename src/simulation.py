@@ -4,35 +4,34 @@ from pvlib.location import Location
 from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS
 
 from data.containter import *
-from data import ram_cached
+from data.ram_cached import ram_cache
 
 
-def construct_pvsystem(pv: PV):
-    module = ram_cached.fetch_modules()[pv.panel_manufacturer][pv.panel_series][pv.panel_model]
-    inverter = ram_cached.fetch_inverters()[pv.inverter_manufacturer][pv.inverter_series][pv.inverter_model]
-    temperature_model_parameters = TEMPERATURE_MODEL_PARAMETERS["sapm"][pv.case]
+def construct_pvsystem(system_data: PVSystemData):
     arrays = []
-
-    for i in range(pv.number_of_modules):
+    for i, module in enumerate(system_data.modules):
+        panel = ram_cache.panels[module.panel.manufacturer][module.panel.series][module.panel.model]
+        temperature_model_parameters = TEMPERATURE_MODEL_PARAMETERS["sapm"][module.case.value]
         arrays.append(
             Array(
                 mount=FixedMount(
-                    surface_azimuth=pv.azimuth
-                    if i < pv.side1
-                    else (pv.azimuth + 180) % 360,
-                    surface_tilt=pv.tilt,
+                    surface_azimuth=system_data.azimuth
+                    if i < system_data.side1
+                    else (system_data.azimuth + 180) % 360,
+                    surface_tilt=system_data.tilt,
                 ),
-                module_parameters=module,
+                module_parameters=panel,
                 temperature_model_parameters=temperature_model_parameters,
             )
         )
+
+    inverter = ram_cache.inverters[system_data.inverter.manufacturer][system_data.inverter.series][
+        system_data.inverter.model]
     system = PVSystem(arrays=arrays, inverter_parameters=inverter)
     return system
 
 
-def simulate(pos: Position, pv: PV, radiation) -> Result:
-    location = Location(pos.latitude, pos.longitude, altitude=pos.altitude)
-
+def simulate(location: Location, pv: PVSystemData, radiation) -> Result:
     system = construct_pvsystem(pv)
 
     mc = ModelChain(system, location, aoi_model="physical", spectral_model="no_loss")

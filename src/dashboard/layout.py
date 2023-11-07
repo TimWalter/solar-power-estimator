@@ -1,4 +1,3 @@
-from constants.custom_components import *
 from dashboard.elements import *
 
 
@@ -67,7 +66,11 @@ def pv_subsection() -> dbc.Container:
                     dbc.Col(panel_manufacturer_dropdown()),
                     dbc.Col(panel_series_dropdown()),
                     dbc.Col(panel_model_dropdown()),
-                ]
+                    dbc.Col(custom_panel_button()),
+                    dbc.Col(save_custom_panel_button()),
+                    dbc.Col(saved_custom_panel_alert())
+                ],
+                align="end",
             ),
             dbc.Row(dbc.Col(panel_stats())),
             dbc.Row(
@@ -88,7 +91,11 @@ def pv_subsection() -> dbc.Container:
                 dbc.Col(inverter_manufacturer_dropdown()),
                 dbc.Col(inverter_series_dropdown()),
                 dbc.Col(inverter_model_dropdown()),
-            ]),
+                dbc.Col(custom_inverter_button()),
+                dbc.Col(save_custom_inverter_button()),
+                dbc.Col(saved_custom_inverter_alert())
+            ], align="end"),
+            dbc.Row(dbc.Col(inverter_stats())),
         ],
         fluid=True,
     )
