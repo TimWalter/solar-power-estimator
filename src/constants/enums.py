@@ -34,7 +34,7 @@ class CellType(Enum):
             return CellType[cec_name]
 
 
-class Cases(Enum):
+class Case(Enum):
     OpenRackGlassGlass = "open_rack_glass_glass"
     OpenRackGlassPolymer = "open_rack_glass_polymer"
     CloseMountGlassGlass = "close_mount_glass_glass"

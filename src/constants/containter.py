@@ -4,18 +4,18 @@ from datetime import datetime
 import pvlib.location
 from pvlib.modelchain import ModelChainResult
 
-from constants.enums import CellType, Cases, OptimizationState
+from constants.enums import CellType, Case, OptimizationState
 from data.ram_cached import ram_cache
 
 
 class Location(pvlib.location.Location):
     def __init__(
-        self,
-        name: str = "Weißenbach Sarntal",
-        latitude: float = 46.77036973837921,
-        longitude: float = 11.372327644143732,
-        altitude: float = 1330,
-        **kwargs
+            self,
+            name: str = "Weißenbach Sarntal",
+            latitude: float = 46.77036973837921,
+            longitude: float = 11.372327644143732,
+            altitude: float = 1330,
+            **kwargs
     ):
         super().__init__(latitude, longitude, altitude=altitude, name=name, **kwargs)
 
@@ -43,6 +43,14 @@ class ProductIdentifier:
 
 @dataclass
 class PVSystemData:
+
+    def make_consistent_modules(self, module):
+        self.modules = []
+        for i in range(self.side1 + self.side2):
+            self.modules.append(module)
+            if i >= self.side1 and self.bipartite:
+                self.modules[i].azimuth = (self.modules[i].azimuth + 180) % 360
+
     @dataclass
     class Module:
         @dataclass
@@ -72,7 +80,7 @@ class PVSystemData:
                         "alpha_sc": self.t_v_oc,
                         "beta_oc": self.t_i_sc,
                         "gamma_r": self.t_p_mp,
-                        "Technology": self.cell_type.to_cec(),
+                        "Technology": self.cell_type,
                         "N_s": self.n_cells_series,
                     }
 
@@ -96,7 +104,7 @@ class PVSystemData:
             )
 
         panel: Panel = field(default_factory=Panel)
-        case: Cases = Cases.CloseMountGlassGlass
+        case: Case = Case.CloseMountGlassGlass
         tilt: float = 30
         azimuth: float = 30
 

@@ -1,9 +1,8 @@
 import unittest
 
-from simulation import simulate
-from constants.containter import PVSystemData, DateTimeRange, Location
 import data.disk_cached
-
+from constants.containter import PVSystemData, DateTimeRange, Location
+from simulation import simulate
 
 class SimulationTestCase(unittest.TestCase):
     def setUp(self):
@@ -20,7 +19,7 @@ class SimulationTestCase(unittest.TestCase):
 
     def test_simulation_callback(self):
         pass
-
+    #additionally test various cases with bipartite etc. different parameters
 
 if __name__ == "__main__":
     unittest.main()

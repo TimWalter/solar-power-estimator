@@ -4,7 +4,14 @@ from dash import Dash, CeleryManager, DiskcacheManager
 from dash_bootstrap_components import themes, icons
 
 from dashboard.layout import get_layout
-from dashboard.callbacks import get_callbacks
+import dashboard.callbacks.input as ci
+import dashboard.callbacks.control as cc
+import dashboard.callbacks.output as co
+
+ci.no_import_removal()
+cc.no_import_removal()
+co.no_import_removal()
+
 
 # TODO nicer map with zoom, compass etc.as connect to map? (movable point and than just translate its location)
 # TODO select place by map
@@ -32,6 +39,7 @@ from dashboard.callbacks import get_callbacks
 # TODO instead of initial collapse state do not prevent initial callback
 # TODO refactor panel stats
 # TODO refactor custom callbacks
+# TODO reintroduce roof height, for pvsystem
 
 
 if "REDIS_URL" in os.environ:
@@ -60,5 +68,4 @@ app = Dash(
 app.layout = get_layout()
 
 if __name__ == "__main__":
-    get_callbacks(app)
     app.run(debug=True)

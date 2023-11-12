@@ -64,8 +64,8 @@ def optimize(
     x0 = np.array(init_tilt + init_azimuth)
     bounds = bounds_tilt + bounds_azimuth
 
-    tilt = init_tilt
-    azimuth = init_azimuth
+    tilt = pv.modules[0].tilt
+    azimuth = pv.modules[0].azimuth
     if x0.size > 0:
         results = minimize(
             cost_function,

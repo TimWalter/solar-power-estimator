@@ -1,4 +1,11 @@
-from dashboard.elements import *
+import dashboard.elements.control as control
+import dashboard.elements.inverter as inverter
+import dashboard.elements.location as location
+import dashboard.elements.output as output
+import dashboard.elements.panel as panel
+from dashboard.elements.pv import *
+from dashboard.elements.time import *
+from dashboard.elements.title import *
 
 
 def get_layout() -> dbc.Container:
@@ -23,7 +30,7 @@ def input_section() -> dbc.Container:
         [
             dbc.Row(dbc.Col(location_subsection())),
             horizontal_line(),
-            dbc.Row(dbc.Col(simulation_time_daterangepicker()), justify="center"),
+            dbc.Row(dbc.Col(time()), justify="center"),
             horizontal_line(),
             dbc.Row(dbc.Col(pv_subsection())),
         ],
@@ -34,20 +41,20 @@ def input_section() -> dbc.Container:
 def location_subsection() -> dbc.Container:
     return dbc.Container(
         [
-            dbc.Row(dbc.Col(location_dropdown())),
-            dbc.Row(dbc.Col(map_graph())),
+            dbc.Row(dbc.Col(location.name_dropdown())),
+            dbc.Row(dbc.Col(location.map_graph())),
             dbc.Row(
                 [
                     dbc.Col(
-                        latitude_input(),
+                        location.latitude_input(),
                         width=3,
                     ),
                     dbc.Col(
-                        longitude_input(),
+                        location.longitude_input(),
                         width=3,
                     ),
                     dbc.Col(
-                        altitude_input(),
+                        location.altitude_input(),
                         width=3,
                     ),
                 ],
@@ -63,16 +70,16 @@ def pv_subsection() -> dbc.Container:
         [
             dbc.Row(
                 [
-                    dbc.Col(panel_manufacturer_dropdown()),
-                    dbc.Col(panel_series_dropdown()),
-                    dbc.Col(panel_model_dropdown()),
-                    dbc.Col(custom_panel_button()),
-                    dbc.Col(save_custom_panel_button()),
-                    dbc.Col(saved_custom_panel_alert())
+                    dbc.Col(panel.manufacturer_dropdown()),
+                    dbc.Col(panel.series_dropdown()),
+                    dbc.Col(panel.model_dropdown()),
+                    dbc.Col(panel.custom_button()),
+                    dbc.Col(panel.save_custom_button()),
+                    dbc.Col(panel.saved_custom_alert())
                 ],
                 align="end",
             ),
-            dbc.Row(dbc.Col(panel_stats())),
+            dbc.Row(dbc.Col(panel.stats())),
             dbc.Row(
                 [
                     dbc.Col(case_dropdown()),
@@ -88,14 +95,14 @@ def pv_subsection() -> dbc.Container:
                 align="end",
             ),
             dbc.Row([
-                dbc.Col(inverter_manufacturer_dropdown()),
-                dbc.Col(inverter_series_dropdown()),
-                dbc.Col(inverter_model_dropdown()),
-                dbc.Col(custom_inverter_button()),
-                dbc.Col(save_custom_inverter_button()),
-                dbc.Col(saved_custom_inverter_alert())
+                dbc.Col(inverter.manufacturer_dropdown()),
+                dbc.Col(inverter.series_dropdown()),
+                dbc.Col(inverter.model_dropdown()),
+                dbc.Col(inverter.custom_button()),
+                dbc.Col(inverter.save_custom_button()),
+                dbc.Col(inverter.saved_custom_alert())
             ], align="end"),
-            dbc.Row(dbc.Col(inverter_stats())),
+            dbc.Row(dbc.Col(inverter.stats())),
         ],
         fluid=True,
     )
@@ -109,15 +116,15 @@ def control_section() -> dbc.Container:
                     [
                         dbc.Row(
                             [
-                                dbc.Col(start_button(), width={"size": 5, "offset": 2}),
-                                dbc.Col(cancel_button(), width=5),
+                                dbc.Col(control.start_button(), width={"size": 5, "offset": 2}),
+                                dbc.Col(control.cancel_button(), width=5),
                             ]
                         ),
                     ],
                     width=2,
                     align="center",
                 ),
-                dbc.Col(progress_bar(), width=10),
+                dbc.Col(control.progress_bar(), width=10),
             ]
         ),
         fluid=True,
@@ -127,11 +134,11 @@ def control_section() -> dbc.Container:
 def output_section() -> dbc.Container:
     return dbc.Container(
         [
-            result_label(),
+            output.label(),
             dbc.Stack(
                 [
-                    output_table(),
-                    output_plot(),
+                    output.table(),
+                    output.plot(),
                 ]
             ),
         ],

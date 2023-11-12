@@ -20,9 +20,26 @@ class ID:
         class PV:
             @dataclass
             class Panel:
-                manufacturer: str = "pv_panel_manufacturer"
-                series: str = "pv_panel_series"
-                model: str = "pv_panel_model"
+                @dataclass
+                class Manufacturer:
+                    input: str = "pv_panel_manufacturer"
+                    store: str = "pv_panel_manufacturer_store"
+
+                manufacturer: Manufacturer = field(default_factory=Manufacturer)
+
+                @dataclass
+                class Series:
+                    input: str = "pv_panel_series"
+                    store: str = "pv_panel_series_store"
+
+                series: Series = field(default_factory=Series)
+
+                @dataclass
+                class Model:
+                    input: str = "pv_panel_model"
+                    store: str = "pv_panel_model_store"
+
+                model: Model = field(default_factory=Model)
 
                 @dataclass
                 class Custom:
@@ -30,9 +47,6 @@ class ID:
                     save: str = "pv_panel_save_custom_button"
                     fade: str = "pv_panel_custom_fade"
                     success: str = "pv_panel_custom_success"
-                    manufacturer_store: str = "pv_panel_custom_manufacturer_store"
-                    series_store: str = "pv_panel_custom_series_store"
-                    model_store: str = "pv_panel_custom_model_store"
 
                 custom: Custom = field(default_factory=Custom)
 
@@ -46,7 +60,7 @@ class ID:
                     t_v_oc: str = "pv_panel_panel_stats_t_v_oc"
                     t_i_sc: str = "pv_panel_panel_stats_t_i_sc"
                     t_p_mp: str = "pv_panel_panel_stats_t_p_mp"
-                    technology: str = "pv_panel_panel_stats_technology"
+                    cell_type: str = "pv_panel_panel_stats_technology"
                     n_cells_series: str = "pv_panel_panel_stats_n_cells_series"
 
                 stats: Stats = field(default_factory=Stats)
@@ -110,9 +124,26 @@ class ID:
 
             @dataclass
             class Inverter:
-                manufacturer: str = "pv_inverter_manufacturer"
-                series: str = "pv_inverter_series"
-                model: str = "pv_inverter_model"
+                @dataclass
+                class Manufacturer:
+                    input: str = "pv_inverter_manufacturer"
+                    store: str = "pv_inverter_manufacturer_store"
+
+                manufacturer: Manufacturer = field(default_factory=Manufacturer)
+
+                @dataclass
+                class Series:
+                    input: str = "pv_inverter_series"
+                    store: str = "pv_inverter_series_store"
+
+                series: Series = field(default_factory=Series)
+
+                @dataclass
+                class Model:
+                    input: str = "pv_inverter_model"
+                    store: str = "pv_inverter_model_store"
+
+                model: Model = field(default_factory=Model)
 
                 @dataclass
                 class Custom:
@@ -120,9 +151,6 @@ class ID:
                     save: str = "pv_inverter_save_custom_button"
                     fade: str = "pv_inverter_custom_fade"
                     success: str = "pv_inverter_custom_success"
-                    manufacturer_store: str = "pv_inverter_custom_manufacturer_store"
-                    series_store: str = "pv_inverter_custom_series_store"
-                    model_store: str = "pv_inverter_custom_model_store"
 
                 custom: Custom = field(default_factory=Custom)
 
