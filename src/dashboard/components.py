@@ -10,7 +10,7 @@ def labelled_dropdown(
         options: list,
         value: str,
         disabled: bool = False,
-        store_id: str = None
+        store_id: str = None,
 ) -> dbc.Container:
     return dbc.Container(
         [
@@ -59,10 +59,10 @@ def horizontal_line():
 def labelled_input_group(
         symbol: list,
         description: str,
-        unit: str,
         input_id: str,
         initial_value: str,
-        type="number",
+        unit: str = None,
+        type: str = "number",
         disabled=False,
 ) -> dbc.InputGroup:
     return dbc.InputGroup(
@@ -76,7 +76,28 @@ def labelled_input_group(
                     dbc.Label(description),
                 ]
             ),
-            dbc.InputGroupText(unit),
+            dbc.InputGroupText(unit) if unit else None,
+        ],
+        className="mb-3",
+    )
+
+
+def labelled_select_group(
+        description: str,
+        input_id: str,
+        options: list,
+        value: str,
+        disabled=False,
+):
+    return dbc.InputGroup(
+        [
+            dbc.InputGroupText(description),
+            dbc.Select(
+                id=input_id,
+                options=options,
+                value=value,
+                disabled=disabled,
+            )
         ],
         className="mb-3",
     )

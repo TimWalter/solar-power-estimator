@@ -68,18 +68,7 @@ def location_subsection() -> dbc.Container:
 def pv_subsection() -> dbc.Container:
     return dbc.Container(
         [
-            dbc.Row(
-                [
-                    dbc.Col(panel.manufacturer_dropdown()),
-                    dbc.Col(panel.series_dropdown()),
-                    dbc.Col(panel.model_dropdown()),
-                    dbc.Col(panel.custom_button()),
-                    dbc.Col(panel.save_custom_button()),
-                    dbc.Col(panel.saved_custom_alert())
-                ],
-                align="end",
-            ),
-            dbc.Row(dbc.Col(panel.stats())),
+            dbc.Row(dbc.Col(panel_subsubsection())),
             dbc.Row(
                 [
                     dbc.Col(case_dropdown()),
@@ -105,6 +94,33 @@ def pv_subsection() -> dbc.Container:
             dbc.Row(dbc.Col(inverter.stats())),
         ],
         fluid=True,
+    )
+
+
+def panel_subsubsection() -> dbc.Container:
+    return dbc.Container(
+        [
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dbc.Col(panel.manufacturer_dropdown()),
+                            dbc.Col(panel.series_dropdown()),
+                            dbc.Col(panel.model_dropdown()),
+                        ]
+                    ),
+                    dbc.Col(
+                        [
+                            panel.saved_custom_alert(),
+                            panel.custom_button(),
+                            panel.save_custom_button(),
+                        ]
+                    ),
+                    dbc.Col(panel.stats()),
+                ]
+            )
+        ],
+        fluid=True
     )
 
 

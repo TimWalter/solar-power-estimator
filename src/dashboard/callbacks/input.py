@@ -164,9 +164,9 @@ def custom_button_callback(idx_prefix):
     )
     def custom_button(active):
         if active:
-            return ["item-0"], True, *([False] * (1 + len(idx_prefix.stats)))
+            return ["item-0"], True, *([False] * len(asdict(idx_prefix.stats).values()))
         else:
-            return no_update, False, *([True] * (1 + len(idx_prefix.stats)))
+            return no_update, False, *([True] * len(asdict(idx_prefix.stats).values()))
 
 
 custom_button_callback(ids.input.pv.panel)

@@ -29,16 +29,9 @@ co.no_import_removal()
 # TODO consistent documentation
 # TODO proper readme
 
-# TODO overhaul inverter to give custom option and show parameters
-# TODO introduce other library
-# TODO show stats of modules and inverters
-
 # TODO allow save/caching of various results
 # TODO allow comparison of different runs
-# TODO refactor (especially elements), also ids (group them), elements come with callbacks
 # TODO instead of initial collapse state do not prevent initial callback
-# TODO refactor panel stats
-# TODO refactor custom callbacks
 # TODO reintroduce roof height, for pvsystem
 
 

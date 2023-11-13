@@ -79,115 +79,82 @@ def stats() -> dbc.Accordion:
         [
             dbc.AccordionItem(
                 [
-                    dbc.Row(
-                        [
-                            dbc.Col(
-                                labelled_input_group(
-                                    ["P", html.Sub("ac_o")],
-                                    "AC power rating of the inverter",
-                                    "W",
-                                    ids.input.pv.inverter.stats.paco,
-                                    default_inverter["Paco"],
-                                    disabled=True,
-                                ),
-                            ),
-                            dbc.Col(
-                                labelled_input_group(
-                                    ["P", html.Sub("dc_o")],
-                                    "DC power input that results in Paco output at reference voltage Vdco",
-                                    "W",
-                                    ids.input.pv.inverter.stats.pdco,
-                                    default_inverter["Pdco"],
-                                    disabled=True,
-                                ),
-                            ),
-                            dbc.Col(
-                                labelled_input_group(
-                                    ["V", html.Sub("dc_o")],
-                                    "DC voltage at which the AC power rating is achieved with Pdco power input",
-                                    "V",
-                                    ids.input.pv.inverter.stats.vdco,
-                                    default_inverter["Vdco"],
-                                    disabled=True,
-                                ),
-                            ),
-                            dbc.Col(
-                                labelled_input_group(
-                                    ["P", html.Sub("s_o")],
-                                    "DC power required to start the inversion process, or self-consumption by inverter",
-                                    "W",
-                                    ids.input.pv.inverter.stats.pso,
-                                    default_inverter["Pso"],
-                                    disabled=True,
-                                ),
-                            ),
-                        ]
+                    labelled_input_group(
+                        ["P", html.Sub("ac")],
+                        "AC power rating of the inverter",
+                        ids.input.pv.inverter.stats.paco,
+                        default_inverter["Paco"],
+                        "W",
+                        disabled=True,
                     ),
-                    dbc.Row(
-                        [
-                            dbc.Col(
-                                labelled_input_group(
-                                    ["C", html.Sub("0")],
-                                    "Parameter defining the curvature (parabolic) of the relationship between AC power and DC power at the reference operating condition",
-                                    "1/V",
-                                    ids.input.pv.inverter.stats.c0,
-                                    default_inverter["C0"],
-                                    disabled=True,
-                                ),
-                            ),
-                            dbc.Col(
-                                labelled_input_group(
-                                    ["C", html.Sub("1")],
-                                    "Empirical coefficient allowing Pdco to vary linearly with DC voltage input",
-                                    "1/V",
-                                    ids.input.pv.inverter.stats.c1,
-                                    default_inverter["C1"],
-                                    disabled=True,
-                                ),
-                            ),
-                            dbc.Col(
-                                labelled_input_group(
-                                    ["C", html.Sub("2")],
-                                    "Empirical coefficient allowing Pso to vary linearly with DC voltage input",
-                                    "1/V",
-                                    ids.input.pv.inverter.stats.c2,
-                                    default_inverter["C2"],
-                                    disabled=True,
-                                ),
-                            ),
-                            dbc.Col(
-                                labelled_input_group(
-                                    ["C", html.Sub("3")],
-                                    "Empirical coefficient allowing C0 to vary linearly with DC voltage input",
-                                    "1/V",
-                                    ids.input.pv.inverter.stats.c3,
-                                    default_inverter["C3"],
-                                    disabled=True,
-                                ),
-                            ),
-                        ]
+                    labelled_input_group(
+                        ["P", html.Sub("dc")],
+                        "DC power required to achieve the power rating",
+                        ids.input.pv.inverter.stats.pdco,
+                        default_inverter["Pdco"],
+                        "W",
+                        disabled=True,
                     ),
-                    dbc.Row(
-                        [
-                            dbc.Col(
-                                dbc.Col(
-                                    labelled_input_group(
-                                        ["P", html.Sub("nt")],
-                                        "AC power consumed by the inverter at night (night tare)",
-                                        "W",
-                                        ids.input.pv.inverter.stats.pnt,
-                                        default_inverter["Pnt"],
-                                        disabled=True,
-                                    ),
-                                ),
-                            ),
-                        ]
+                    labelled_input_group(
+                        ["V", html.Sub("dc")],
+                        "DC voltage required to achieve the power rating",
+                        ids.input.pv.inverter.stats.vdco,
+                        default_inverter["Vdco"],
+                        "V",
+                        disabled=True,
+                    ),
+                    labelled_input_group(
+                        ["P", html.Sub("s")],
+                        "DC power required to start the inversion process",
+                        ids.input.pv.inverter.stats.pso,
+                        default_inverter["Pso"],
+                        "W",
+                        disabled=True,
+                    ),
+                    labelled_input_group(
+                        ["C", html.Sub("0")],
+                        "AC-DC Coefficient",
+                        ids.input.pv.inverter.stats.c0,
+                        default_inverter["C0"],
+                        "1/V",
+                        disabled=True,
+                    ),
+                    labelled_input_group(
+                        ["C", html.Sub("1")],
+                        "DC Power-Voltage Coefficient at power rating",
+                        ids.input.pv.inverter.stats.c1,
+                        default_inverter["C1"],
+                        "1/V",
+                        disabled=True,
+                    ),
+                    labelled_input_group(
+                        ["C", html.Sub("2")],
+                        "DC Power-Voltage Coefficient at start of inversion",
+                        ids.input.pv.inverter.stats.c2,
+                        default_inverter["C2"],
+                        "1/V",
+                        disabled=True,
+                    ),
+                    labelled_input_group(
+                        ["C", html.Sub("3")],
+                        "C0-Voltage(DC) coefficient",
+                        ids.input.pv.inverter.stats.c3,
+                        default_inverter["C3"],
+                        "1/V",
+                        disabled=True,
+                    ),
+                    labelled_input_group(
+                        ["P", html.Sub("nt")],
+                        "AC Night Tare",
+                        ids.input.pv.inverter.stats.pnt,
+                        default_inverter["Pnt"],
+                        "W",
+                        disabled=True,
                     ),
                 ],
                 title="Inverter Stats",
             )
         ],
         id=ids.input.pv.inverter.stats.accordion,
-        flush=True,
         start_collapsed=True,
     )
