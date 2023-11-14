@@ -41,7 +41,7 @@ def model_dropdown() -> dbc.Container:
 def custom_button() -> dbc.Container:
     return dbc.Container(
         dbc.Button(
-            "Add Inverter",
+            "Edit Inverter",
             id=ids.input.pv.inverter.custom.button,
             active=False,
         ),
@@ -157,4 +157,5 @@ def stats() -> dbc.Accordion:
         ],
         id=ids.input.pv.inverter.stats.accordion,
         start_collapsed=True,
+        style={"margin-left": "1vh", "margin-right": "1vh"},
     )

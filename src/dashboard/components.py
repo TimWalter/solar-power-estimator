@@ -5,12 +5,12 @@ from constants.enums import OptimizationState
 
 
 def labelled_dropdown(
-        label: str,
-        input_id: str,
-        options: list,
-        value: str,
-        disabled: bool = False,
-        store_id: str = None,
+    label: str,
+    input_id: str,
+    options: list,
+    value: str,
+    disabled: bool = False,
+    store_id: str = None,
 ) -> dbc.Container:
     return dbc.Container(
         [
@@ -30,23 +30,22 @@ def labelled_dropdown(
 
 
 def labelled_input(
-        title: str,
-        input_id: str,
-        initial_value: int,
-        placeholder: str = None,
-        input_type: str = "number",
-) -> dbc.Container:
-    return dbc.Container(
+    label: str,
+    input_id: str,
+    initial_value: int,
+    placeholder: str = None,
+    input_type: str = "number",
+) -> dbc.FormFloating:
+    return dbc.FormFloating(
         [
-            dbc.Label(title),
             dbc.Input(
                 id=input_id,
                 type=input_type,
                 value=initial_value,
-                placeholder=placeholder
+                placeholder=placeholder,
             ),
-        ],
-        fluid=True,
+            dbc.Label(label),
+        ]
     )
 
 
@@ -57,13 +56,13 @@ def horizontal_line():
 
 
 def labelled_input_group(
-        symbol: list,
-        description: str,
-        input_id: str,
-        initial_value: str,
-        unit: str = None,
-        type: str = "number",
-        disabled=False,
+    symbol: list,
+    description: str,
+    input_id: str,
+    initial_value: str,
+    unit: str = None,
+    type: str = "number",
+    disabled=False,
 ) -> dbc.InputGroup:
     return dbc.InputGroup(
         [
@@ -83,11 +82,11 @@ def labelled_input_group(
 
 
 def labelled_select_group(
-        description: str,
-        input_id: str,
-        options: list,
-        value: str,
-        disabled=False,
+    description: str,
+    input_id: str,
+    options: list,
+    value: str,
+    disabled=False,
 ):
     return dbc.InputGroup(
         [
@@ -97,33 +96,33 @@ def labelled_select_group(
                 options=options,
                 value=value,
                 disabled=disabled,
-            )
+            ),
         ],
         className="mb-3",
     )
 
 
 def labelled_optimizable_number_input(
-        title: str,
-        radio_id: str,
-        radio_value: OptimizationState,
-        fix_collapse_id: str,
-        fix_input_id: str,
-        fix_input_value: float,
-        constrain_collapse_id: str,
-        constrain_min_id: str,
-        constrain_min_value: float,
-        constrain_max_id: str,
-        constrain_max_value: float,
+    title: str,
+    radio_id: str,
+    radio_value: OptimizationState,
+    fix_collapse_id: str,
+    fix_input_id: str,
+    fix_input_value: float,
+    constrain_collapse_id: str,
+    constrain_min_id: str,
+    constrain_min_value: float,
+    constrain_max_id: str,
+    constrain_max_value: float,
 ) -> dbc.Container:
     return dbc.Container(
         [
-            dbc.Row(dbc.Col(dbc.Label(title))),
             dbc.Row(
                 [
+                    dbc.Col(dbc.Label(title), width=2),
                     dbc.Col(
                         optimization_radio(radio_id, radio_value),
-                        width=5,
+                        width=6,
                     ),
                     dbc.Col(
                         [
@@ -138,9 +137,11 @@ def labelled_optimizable_number_input(
                                 constrain_max_value,
                             ),
                         ],
-                        width=7,
+                        width=3,
                     ),
                 ],
+                justify="around",
+                align="center",
             ),
         ],
         fluid=True,
@@ -177,11 +178,11 @@ def collapse_input(input_id: str, input_value: float, collapse_id: str) -> dbc.C
 
 
 def collapse_double_input(
-        collapse_id: str,
-        input1_id: str,
-        input1_value: float,
-        input2_id: str,
-        input2_value: float,
+    collapse_id: str,
+    input1_id: str,
+    input1_value: float,
+    input2_id: str,
+    input2_value: float,
 ) -> dbc.Collapse:
     return dbc.Collapse(
         [

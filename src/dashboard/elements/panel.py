@@ -41,7 +41,7 @@ def model_dropdown() -> dbc.Container:
 def custom_button() -> dbc.Container:
     return dbc.Container(
         dbc.Button(
-            "Add Panel",
+            "Edit Panel",
             id=ids.input.pv.panel.custom.button,
             active=False,
         ),
@@ -157,11 +157,11 @@ def stats() -> dbc.Accordion:
                         "V/°C",
                         disabled=True,
                     ),
-
                 ],
                 title="Panel Stats",
             )
         ],
         id=ids.input.pv.panel.stats.accordion,
         start_collapsed=True,
+        style={"margin-left": "1vh", "margin-right": "1vh"},
     )

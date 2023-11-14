@@ -67,60 +67,60 @@ def location_subsection() -> dbc.Container:
 
 def pv_subsection() -> dbc.Container:
     return dbc.Container(
-        [
-            dbc.Row(dbc.Col(panel_subsubsection())),
-            dbc.Row(
-                [
-                    dbc.Col(case_dropdown()),
-                    dbc.Col(number_of_modules_input()),
-                ]
-            ),
-            dbc.Row(
-                [
-                    dbc.Col(tilt_input()),
-                    dbc.Col(azimuth_input()),
-                    dbc.Col(bipartite_input()),
-                ],
-                align="end",
-            ),
-            dbc.Row([
-                dbc.Col(inverter.manufacturer_dropdown()),
-                dbc.Col(inverter.series_dropdown()),
-                dbc.Col(inverter.model_dropdown()),
-                dbc.Col(inverter.custom_button()),
-                dbc.Col(inverter.save_custom_button()),
-                dbc.Col(inverter.saved_custom_alert())
-            ], align="end"),
-            dbc.Row(dbc.Col(inverter.stats())),
-        ],
+        dbc.Row(
+            [
+                dbc.Col(
+                    dbc.Stack(
+                        [
+                            panel.manufacturer_dropdown(),
+                            panel.series_dropdown(),
+                            panel.model_dropdown(),
+                            dbc.Row(
+                                [
+                                    dbc.Col(panel.custom_button()),
+                                    dbc.Col(panel.save_custom_button()),
+                                    dbc.Col(panel.saved_custom_alert()),
+                                ]
+                            ),
+                            panel.stats(),
+                            case_dropdown(),
+                        ],
+                        gap=3,
+                    )
+                ),
+                dbc.Col(
+                    dbc.Stack(
+                        [
+                            number_of_modules_input(),
+                            tilt_input(),
+                            azimuth_input(),
+                            bipartite_input(),
+                        ],
+                        gap=3,
+                    ),
+                ),
+                dbc.Col(
+                    dbc.Stack(
+                        [
+                            inverter.manufacturer_dropdown(),
+                            inverter.series_dropdown(),
+                            inverter.model_dropdown(),
+                            dbc.Row(
+                                [
+                                    dbc.Col(inverter.custom_button()),
+                                    dbc.Col(inverter.save_custom_button()),
+                                    dbc.Col(inverter.saved_custom_alert()),
+                                ]
+                            ),
+                            inverter.stats(),
+                        ],
+                        gap=3,
+                    )
+                ),
+            ],
+            justify="center",
+        ),
         fluid=True,
-    )
-
-
-def panel_subsubsection() -> dbc.Container:
-    return dbc.Container(
-        [
-            dbc.Row(
-                [
-                    dbc.Col(
-                        [
-                            dbc.Col(panel.manufacturer_dropdown()),
-                            dbc.Col(panel.series_dropdown()),
-                            dbc.Col(panel.model_dropdown()),
-                        ]
-                    ),
-                    dbc.Col(
-                        [
-                            panel.saved_custom_alert(),
-                            panel.custom_button(),
-                            panel.save_custom_button(),
-                        ]
-                    ),
-                    dbc.Col(panel.stats()),
-                ]
-            )
-        ],
-        fluid=True
     )
 
 
@@ -132,7 +132,10 @@ def control_section() -> dbc.Container:
                     [
                         dbc.Row(
                             [
-                                dbc.Col(control.start_button(), width={"size": 5, "offset": 2}),
+                                dbc.Col(
+                                    control.start_button(),
+                                    width={"size": 5, "offset": 2},
+                                ),
                                 dbc.Col(control.cancel_button(), width=5),
                             ]
                         ),

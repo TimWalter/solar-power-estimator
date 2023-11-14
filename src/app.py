@@ -12,6 +12,9 @@ ci.no_import_removal()
 cc.no_import_removal()
 co.no_import_removal()
 
+# TODO 1. Nicer layout
+# TODO 2. Tests
+# TODO 3. Validation
 
 # TODO nicer map with zoom, compass etc.as connect to map? (movable point and than just translate its location)
 # TODO select place by map
