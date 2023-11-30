@@ -26,6 +26,7 @@ def labelled_dropdown(
             dcc.Store(id=store_id) if store_id else None,
         ],
         fluid=True,
+        style={'marginLeft': '-1vh', 'width': '105%'}
     )
 
 

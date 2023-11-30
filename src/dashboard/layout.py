@@ -12,7 +12,9 @@ def get_layout() -> dbc.Container:
     return dbc.Container(
         [
             dbc.Row(dbc.Col(title()), justify="center"),
-            dbc.Row(dbc.Col(input_section())),
+            dbc.Row(dbc.Col(location_subsection())),
+            dbc.Row(dbc.Col(horizontal_line())),
+            dbc.Row(dbc.Col(pv_subsection())),
             dbc.Row(dbc.Col(horizontal_line())),
             dbc.Row(dbc.Col(control_section())),
             dbc.Row(dbc.Col(horizontal_line())),
@@ -25,71 +27,58 @@ def get_layout() -> dbc.Container:
     )
 
 
-def input_section() -> dbc.Container:
-    return dbc.Container(
+def location_subsection() -> dbc.Row:
+    return dbc.Row(
         [
-            dbc.Row(dbc.Col(location_subsection())),
-            horizontal_line(),
-            dbc.Row(dbc.Col(time()), justify="center"),
-            horizontal_line(),
-            dbc.Row(dbc.Col(pv_subsection())),
-        ],
-        fluid=True,
-    )
-
-
-def location_subsection() -> dbc.Container:
-    return dbc.Container(
-        [
-            dbc.Row(dbc.Col(location.name_dropdown())),
-            dbc.Row(dbc.Col(location.map_graph())),
-            dbc.Row(
-                [
-                    dbc.Col(
+            dbc.Col([
+                dbc.Stack(
+                    [
+                        location.name_dropdown(),
                         location.latitude_input(),
-                        width=3,
-                    ),
-                    dbc.Col(
                         location.longitude_input(),
-                        width=3,
-                    ),
-                    dbc.Col(
                         location.altitude_input(),
-                        width=3,
-                    ),
-                ],
-                justify="center",
-            ),
+                        horizontal_line(),
+                        time()
+                    ],
+                    gap=2,
+                )
+            ], align="start", width=3),
+            dbc.Col(location.map_graph(), width=9),
         ],
-        fluid=True,
+        justify="center",
     )
 
 
 def pv_subsection() -> dbc.Container:
     return dbc.Container(
-        dbc.Row(
+        dbc.Tabs(
             [
-                dbc.Col(
-                    dbc.Stack(
-                        [
-                            panel.manufacturer_dropdown(),
-                            panel.series_dropdown(),
-                            panel.model_dropdown(),
-                            dbc.Row(
-                                [
-                                    dbc.Col(panel.custom_button()),
-                                    dbc.Col(panel.save_custom_button()),
-                                    dbc.Col(panel.saved_custom_alert()),
-                                ]
-                            ),
-                            panel.stats(),
-                            case_dropdown(),
-                        ],
-                        gap=3,
-                    )
+                dbc.Tab(
+                    dbc.Row([
+                        dbc.Col(dbc.Stack(
+                            [
+                                panel.manufacturer_dropdown(),
+                                panel.series_dropdown(),
+                                panel.model_dropdown(),
+                                dbc.Row(
+                                    [
+                                        dbc.Col(panel.custom_button()),
+                                        dbc.Col(panel.save_custom_button()),
+                                        dbc.Col(panel.saved_custom_alert()),
+                                    ]
+                                ),
+
+                                case_dropdown(),
+                            ],
+                            gap=3,
+                        ), width=6),
+                        dbc.Col(panel.stats(), width=6, style={"margin-top": "3vh"}),
+                    ], style={"margin-top": "3vh"}),
+
+                    label="Panel"
                 ),
-                dbc.Col(
-                    dbc.Stack(
+                dbc.Tab(
+                    dbc.Row(dbc.Col(dbc.Stack(
                         [
                             number_of_modules_input(),
                             tilt_input(),
@@ -97,30 +86,38 @@ def pv_subsection() -> dbc.Container:
                             bipartite_input(),
                         ],
                         gap=3,
+                    ), width=6), style={"margin-top": "3vh"}
                     ),
+
+                    label="Installation"
                 ),
-                dbc.Col(
-                    dbc.Stack(
-                        [
-                            inverter.manufacturer_dropdown(),
-                            inverter.series_dropdown(),
-                            inverter.model_dropdown(),
-                            dbc.Row(
-                                [
-                                    dbc.Col(inverter.custom_button()),
-                                    dbc.Col(inverter.save_custom_button()),
-                                    dbc.Col(inverter.saved_custom_alert()),
-                                ]
-                            ),
-                            inverter.stats(),
-                        ],
-                        gap=3,
-                    )
+                dbc.Tab(
+                    dbc.Row([
+                        dbc.Col(dbc.Stack(
+                            [
+                                inverter.manufacturer_dropdown(),
+                                inverter.series_dropdown(),
+                                inverter.model_dropdown(),
+                                dbc.Row(
+                                    [
+                                        dbc.Col(inverter.custom_button()),
+                                        dbc.Col(inverter.save_custom_button()),
+                                        dbc.Col(inverter.saved_custom_alert()),
+                                    ]
+                                ),
+
+                            ],
+                            gap=3,
+                        ), width=6),
+                        dbc.Col(inverter.stats(), width=6, style={"margin-top": "3vh"})
+                    ], style={"margin-top": "3vh"}),
+
+                    label="Inverter"
                 ),
-            ],
-            justify="center",
+            ]
         ),
         fluid=True,
+
     )
 
 
@@ -128,23 +125,14 @@ def control_section() -> dbc.Container:
     return dbc.Container(
         dbc.Row(
             [
-                dbc.Col(
+                dbc.Col(dbc.Stack(
                     [
-                        dbc.Row(
-                            [
-                                dbc.Col(
-                                    control.start_button(),
-                                    width={"size": 5, "offset": 2},
-                                ),
-                                dbc.Col(control.cancel_button(), width=5),
-                            ]
-                        ),
-                    ],
-                    width=2,
-                    align="center",
-                ),
-                dbc.Col(control.progress_bar(), width=10),
-            ]
+                        control.start_button(),
+                        control.cancel_button()
+                    ], gap=3,
+                ), width={"size": 2, "offset": 1}),
+                dbc.Col(control.progress_bar(), width=6)
+            ], justify="center"
         ),
         fluid=True,
     )

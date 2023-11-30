@@ -24,9 +24,6 @@ co.no_import_removal()
 # TODO introduce a rotational panel that is optimized for every hour to perfectly follow the sun
 # TODO allow the insertion of demand curves to adapt yield onto demand
 
-
-# TODO accordion for setup? pagination? input groups?
-# TODO use dbc progress instead of custom same for loading, same for table
 # TODO Add validation and remove type constraints to get rid of increment stuff
 
 # TODO consistent documentation

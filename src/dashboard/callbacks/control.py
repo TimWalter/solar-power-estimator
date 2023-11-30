@@ -2,15 +2,16 @@ from dataclasses import asdict
 from itertools import islice
 
 import dash
+from dacite import from_dict
 from dash import Input, Output, State, no_update
 from pvlib.location import Location
-from dacite import from_dict
+import dash_bootstrap_components as dbc
+
 
 import data.disk_cached
 from constants.containter import *
 from constants.ids import ids
 from dashboard.figures import get_table_data, get_graph_figure
-from dashboard.figures import progress_figure
 from optimization import optimize
 from simulation import simulate
 
@@ -77,12 +78,10 @@ def no_import_removal():
         (Output(ids.control.start, "disabled"), True, False),
         (Output(ids.control.cancel.button, "disabled"), False, True),
         (Output(ids.control.cancel.fade, "is_in"), True, False),
-        (Output(ids.control.loading.gif, "hidden"), False, True),
-        (Output(ids.control.loading.placeholder, "hidden"), True, False),
     ],
     cancel=[Input(ids.control.cancel.button, "n_clicks")],
-    progress=Output(ids.control.progress_bar, "figure"),
-    progress_default=progress_figure(0),
+    progress=Output(ids.control.progress_bar, "children"),
+    progress_default=dbc.Progress(value=0, bar=True, label="Start Simulation"),
     prevent_initial_callback=True,
 )
 def start_simulation(set_progress, n_clicks, location, datetimerange, pvsystemdata, module, tilt_info, azimuth_info):
@@ -103,18 +102,17 @@ def start_simulation(set_progress, n_clicks, location, datetimerange, pvsystemda
     tilt_info = OptimizableVariable(**tilt_info)
     azimuth_info = OptimizableVariable(**azimuth_info)
 
+    set_progress([dbc.Progress(value=20, bar=True, label="Fetching Data")])
     # Step 1: Fetch Data
     radiation = data.disk_cached.fetch_radiation(location, time)
-    set_progress(progress_figure(1))
-
+    set_progress([dbc.Progress(value=40, bar=True, label="Optimizing")])
     # Step 2: Optimization
     module.tilt, module.azimuth = optimize(location, pv_system_data, radiation, tilt_info, azimuth_info)
     pv_system_data.make_consistent_modules(module)
-    set_progress(progress_figure(2))
-
+    set_progress([dbc.Progress(value=80, bar=True, label="Simulating")])
     # Step 3: Simulation
     result = simulate(location, pv_system_data, radiation)
-    set_progress(progress_figure(3))
+    set_progress([dbc.Progress(value=100, bar=True, label="Done")])
 
     return (
         get_table_data(pv_system_data, result, tilt_info, azimuth_info),

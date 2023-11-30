@@ -14,8 +14,11 @@ def time() -> dbc.Container:
                 display_format="DD.MM.YYYY",
                 min_date_allowed=datetime(2005, 1, 1),
                 max_date_allowed=datetime(2020, 12, 31),
+                style={
+                    'fontSize': 'inherit',
+                    'fontWeight': 'inherit',
+                }
             ),
         ],
         fluid=True,
-        className="d-flex justify-content-center",
     )

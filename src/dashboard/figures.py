@@ -34,39 +34,6 @@ def map_figure(latitude: float, longitude: float) -> go.Figure:
     )
     return fig
 
-
-def progress_figure(progress):
-    progress_graph = go.Figure(
-        data=[
-            go.Bar(
-                x=[progress],
-                orientation="h",
-                width=3,
-                base=0.5,
-                marker={"color": "rgba(20,125,174,255)"},
-            ),
-        ],
-        layout={
-            "xaxis": {
-                "range": [0, 3.5],
-                "tickmode": "array",
-                "tickvals": np.array(range(4)) + 0.5,
-                "ticktext": [
-                    "Start",
-                    "Fetch Data",
-                    "Optimization",
-                    "Simulation",
-                ],
-                "zeroline": False,
-            },
-            "yaxis": {"showticklabels": False, "visible": False},
-            "title": {"text": "Progress", "y": 0.5, "x": 0.03, "xanchor": "left"},
-            "margin": {"t": 20, "b": 20},
-        },
-    )
-    return progress_graph
-
-
 def get_table_columns(tilt_state: OptimizationState, azimuth_state: OptimizationState, bipartite: bool) -> list:
     angle_format = Format(
         precision=2, scheme=Scheme.fixed, symbol=Symbol.yes, symbol_suffix="˚"

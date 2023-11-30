@@ -22,3 +22,12 @@
     transition: none;
     display: none;
 }
+
+.DateInput_input{
+    font-weight: inherit  !important ;
+    font-size: inherit  !important     ;
+}
+
+.nav-link {
+    color: black !important;
+}
