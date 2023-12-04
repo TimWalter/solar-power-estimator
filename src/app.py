@@ -12,19 +12,19 @@ ci.no_import_removal()
 cc.no_import_removal()
 co.no_import_removal()
 
-# TODO 1. Nicer layout
-# TODO 2. Tests
-# TODO 3. Validation
+# TODO 1. Nicer layout DONE
+# TODO 2. Validation DONE
+# TODO 3. Tests
 
 # TODO nicer map with zoom, compass etc.as connect to map? (movable point and than just translate its location)
 # TODO select place by map
 
 # TODO wrap the site to not have to scroll?
 
+# TODO revisit autograd for optimization (just have to give in tensors?)
+
 # TODO introduce a rotational panel that is optimized for every hour to perfectly follow the sun
 # TODO allow the insertion of demand curves to adapt yield onto demand
-
-# TODO Add validation and remove type constraints to get rid of increment stuff
 
 # TODO consistent documentation
 # TODO proper readme

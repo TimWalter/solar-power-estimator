@@ -17,7 +17,7 @@ def time() -> dbc.Container:
                 style={
                     'fontSize': 'inherit',
                     'fontWeight': 'inherit',
-                }
+                },
             ),
         ],
         fluid=True,

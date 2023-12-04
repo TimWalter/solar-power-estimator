@@ -26,7 +26,7 @@ def labelled_dropdown(
             dcc.Store(id=store_id) if store_id else None,
         ],
         fluid=True,
-        style={'marginLeft': '-1vh', 'width': '105%'}
+        style={"marginLeft": "-1vh", "width": "105%"},
     )
 
 
@@ -71,7 +71,10 @@ def labelled_input_group(
             dbc.FormFloating(
                 [
                     dbc.Input(
-                        id=input_id, type=type, value=initial_value, disabled=disabled
+                        id=input_id,
+                        type=type,
+                        value=initial_value,
+                        disabled=disabled,
                     ),
                     dbc.Label(description),
                 ]

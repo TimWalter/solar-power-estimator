@@ -135,6 +135,23 @@ make_product_identifier_dropdown_text_input(ids.input.pv.panel)
 make_product_identifier_dropdown_text_input(ids.input.pv.inverter)
 
 
+def validate_integer_input(idx):
+    @dash.callback(
+        Output(idx, "invalid"),
+        Input(idx, "value"),
+    )
+    def validate_n_cells(value):
+        if value is not None:
+            return int(value) != value
+        else:
+            return no_update
+
+
+validate_integer_input(ids.input.pv.panel.stats.n_cells_series)
+validate_integer_input(ids.input.pv.number_of_modules)
+validate_integer_input(ids.input.pv.bipartite.side1)
+
+
 def make_toggle_button(idx):
     @dash.callback(
         Output(idx, "active"),
@@ -158,7 +175,12 @@ def custom_button_callback(idx_prefix):
         Output(idx_prefix.stats.accordion, "active_item"),
         Output(idx_prefix.custom.fade, "is_in"),
         Output(idx_prefix.custom.save, "disabled"),
-        *([Output(idx, "disabled") for idx in list(asdict(idx_prefix.stats).values())[1:]]),
+        *(
+            [
+                Output(idx, "disabled")
+                for idx in list(asdict(idx_prefix.stats).values())[1:]
+            ]
+        ),
         Input(idx_prefix.custom.button, "active"),
         prevent_initial_callback=True,
     )
@@ -184,11 +206,11 @@ def save_button_callback(idx_prefix, save_func):
         prevent_initial_callback=True,
     )
     def save_custom_panel(
-            n_clicks,
-            manufacturer,
-            series,
-            model,
-            *stats,
+        n_clicks,
+        manufacturer,
+        series,
+        model,
+        *stats,
     ):
         if n_clicks is None:
             return no_update
@@ -216,7 +238,10 @@ def update_sides_from_number_of_modules(value):
     prevent_initial_call="initial_duplicate",
 )
 def update_side2_from_side1(side1, number_of_modules):
-    return number_of_modules - side1
+    if side1 is not None:
+        return number_of_modules - side1
+    else:
+        return no_update
 
 
 def get_optimizable_input_callback(idx):
